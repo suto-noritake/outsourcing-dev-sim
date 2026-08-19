@@ -2,6 +2,27 @@
 
 FastAPI + static HTML dashboard for `outsourcing_sim` Monte Carlo simulation.
 
+## かんたんな使い方（Windows）
+
+### 1) 起動（ダブルクリック）
+
+- `product\abm-dashboard\launch_dashboard.vbs` をダブルクリックしてください。
+- 数秒待つと、既定ブラウザで `http://127.0.0.1:8000/` が自動で開きます。
+- コンソール画面は表示されません（内部で `launch_dashboard.bat` が非表示実行されます）。
+
+### 2) もし起動できない場合
+
+- `.venv` はリポジトリ直下（`..\..\.venv`）にある前提です。
+- `.venv` が別の場所にある場合は、`launch_dashboard.bat` 内の `VENV_PY` を実環境の
+  `python.exe` パスに合わせて編集してください。
+- ポート 8000 が使用中でも、既に起動済みと判断できる場合はブラウザ表示のみ実行します。
+
+### 3) 画面の使い方
+
+- 左上の「初期値に戻す」で標準パラメータに戻せます。
+- 「シミュレーション実行」で選択中の戦略のみ実行します。
+- 「3戦略を比較」で保守的・コスト最適・適応型を同条件で同時比較します。
+
 ## Setup (PowerShell, Windows)
 
 From repository root:
