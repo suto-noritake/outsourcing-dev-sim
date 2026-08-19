@@ -27,13 +27,27 @@ AIエージェントを用いた「技術受託開発」のシミュレーショ
 - `docs/experiments/` — 実行した実験のrun manifest・結果記録（再現性用、001〜004）
 - [`docs/report.md`](docs/report.md) — **Phase 5: 最終レポート**（Phase2-4の統合結果・考察・限界）
 
+## Phase 6: 製品化 — ABMインタラクティブダッシュボード
+
+[`product/abm-dashboard/`](product/abm-dashboard/) — シミュレーションの主要パラメータをブラウザで
+調整し、その場でモンテカルロ試行を実行して成功率・破産率・4象限分布などを可視化できる
+Webダッシュボード（**製品自体はLLMを使わない**、`outsourcing_sim`をそのまま計算エンジンとして
+再利用）。起動手順は [`product/abm-dashboard/README.md`](product/abm-dashboard/README.md) を参照。
+
+この製品自体は、Phase4で設計した「社内複数ロール構造」を実際の開発プロセスに適用し、
+Bid Manager / Architect / Implementer / QA の4役割を実モデル・実推論強度を割り当てた
+sub-agentとして実行して開発した。各役割の思考ログと使用モデル一覧は
+[`product/abm-dashboard/logs/`](product/abm-dashboard/logs/) に記録している
+（`model_manifest.md`に役割別モデル割当の一覧）。
+
 ## リポジトリ構成
 
 ```
-outsourcing_sim/    # 抽象ABMのPythonパッケージ
-scripts/            # モンテカルロ実行・スクリーニング・分析用スクリプト
-tests/              # ユニットテスト
-docs/               # 設計ドキュメント・実験記録
+outsourcing_sim/           # 抽象ABMのPythonパッケージ
+scripts/                    # モンテカルロ実行・スクリーニング・分析用スクリプト
+tests/                      # ユニットテスト
+docs/                       # 設計ドキュメント・実験記録
+product/abm-dashboard/      # Phase6: ABMインタラクティブダッシュボード（製品）
 ```
 
 ## セットアップ

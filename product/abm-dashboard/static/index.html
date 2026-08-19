@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ABM Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 16px; color: #111827; }
+    h1, h2 { margin: 0 0 12px; }
+    .panel { border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; margin-bottom: 14px; background: #fafafa; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; }
+    label { display: flex; flex-direction: column; font-size: 12px; gap: 4px; }
+    input, select, button { padding: 6px; font-size: 13px; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    .summary-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .strategy-card { border: 1px solid #d1d5db; border-radius: 8px; padding: 10px; background: #fff; }
+    .error { color: #b91c1c; white-space: pre-wrap; margin-top: 8px; }
+    .small { font-size: 12px; color: #6b7280; }
+    canvas { max-height: 400px; }
+  </style>
+</head>
+<body>
+  <h1>ABM Simulation Dashboard</h1>
+
+  <div class="panel">
+    <h2>Parameters</h2>
+    <form id="sim-form">
+      <div class="grid">
+        <label>alpha<input type="number" step="0.01" name="alpha" /></label>
+        <label>beta<input type="number" step="0.01" name="beta" /></label>
+        <label>lam<input type="number" step="0.01" name="lam" /></label>
+        <label>k1<input type="number" step="0.01" name="k1" /></label>
+        <label>cost_curve_exponent<input type="number" step="0.01" name="cost_curve_exponent" /></label>
+        <label>sigma_noise<input type="number" step="0.01" name="sigma_noise" /></label>
+        <label>gamma<input type="number" step="0.01" name="gamma" /></label>
+        <label>partial_pay<input type="number" step="0.01" name="partial_pay" /></label>
+        <label>r_min<input type="number" step="0.01" name="r_min" /></label>
+        <label>max_consecutive_failures<input type="number" step="1" name="max_consecutive_failures" /></label>
+        <label>difficulty_0<input type="number" step="0.01" name="difficulty_0" /></label>
+        <label>funds_0<input type="number" step="0.01" name="funds_0" /></label>
+        <label>difficulty_cap<input type="number" step="0.01" name="difficulty_cap" /></label>
+        <label>budget_c0<input type="number" step="0.01" name="budget_c0" /></label>
+        <label>budget_c1<input type="number" step="0.01" name="budget_c1" /></label>
+        <label>max_rounds<input type="number" step="1" name="max_rounds" /></label>
+        <label>strategy
+          <select name="strategy">
+            <option value="adaptive">adaptive</option>
+            <option value="conservative">conservative</option>
+            <option value="cost_optimal">cost_optimal</option>
+          </select>
+        </label>
+        <label>n_trials<input type="number" step="1" name="n_trials" /></label>
+        <label>base_seed<input type="number" step="1" name="base_seed" /></label>
+      </div>
+      <div class="actions">
+        <button type="button" id="baseline-btn">Baseline</button>
+        <button type="button" id="run-btn">Run Simulation</button>
+        <button type="button" id="compare-btn">Compare 3 strategies</button>
+      </div>
+      <p class="small">Compare mode ignores the strategy selector and runs conservative/cost_optimal/adaptive.</p>
+      <div id="error" class="error"></div>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h2>Summary</h2>
+    <div id="summary" class="summary-grid"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Quadrant Scatter (capability_margin vs funding_runway)</h2>
+    <canvas id="scatter-chart"></canvas>
+  </div>
+
+  <div class="panel">
+    <h2>Survival Rounds Histogram</h2>
+    <canvas id="hist-chart"></canvas>
+  </div>
+
+  <script>
+    const defaults = {
+      alpha: 0.6, beta: 3.0, lam: 0.7, k1: 1.0, cost_curve_exponent: 2.0, sigma_noise: 0.3,
+      gamma: 0.15, partial_pay: 0.0, r_min: 0.4, max_consecutive_failures: 3,
+      difficulty_0: 1.0, funds_0: 100.0, difficulty_cap: 20.0, budget_c0: 5.0, budget_c1: 15.0,
+      max_rounds: 200, strategy: "adaptive", n_trials: 100, base_seed: 0
+    };
+    const strategyOrder = ["conservative", "cost_optimal", "adaptive"];
+    const quadrantColors = {
+      dominant_leader: "#16a34a",
+      cash_starved_specialist: "#f59e0b",
+      deep_pockets_shallow_skills: "#2563eb",
+      exit_candidate: "#dc2626"
+    };
+    const strategyColors = {
+      conservative: "#8b5cf6",
+      cost_optimal: "#14b8a6",
+      adaptive: "#f97316"
+    };
+
+    const form = document.getElementById("sim-form");
+    const summaryEl = document.getElementById("summary");
+    const errorEl = document.getElementById("error");
+    let scatterChart = null;
+    let histChart = null;
+
+    function setDefaults() {
+      for (const [key, value] of Object.entries(defaults)) {
+        const el = form.elements[key];
+        if (el) el.value = value;
+      }
+    }
+
+    function numberValue(name, asInt = false) {
+      const raw = form.elements[name].value;
+      return asInt ? parseInt(raw, 10) : parseFloat(raw);
+    }
+
+    function buildPayload(compareStrategies) {
+      return {
+        params: {
+          alpha: numberValue("alpha"),
+          beta: numberValue("beta"),
+          lam: numberValue("lam"),
+          k1: numberValue("k1"),
+          cost_curve_exponent: numberValue("cost_curve_exponent"),
+          sigma_noise: numberValue("sigma_noise"),
+          gamma: numberValue("gamma"),
+          partial_pay: numberValue("partial_pay"),
+          r_min: numberValue("r_min"),
+          max_consecutive_failures: numberValue("max_consecutive_failures", true),
+          difficulty_0: numberValue("difficulty_0"),
+          funds_0: numberValue("funds_0"),
+          difficulty_cap: numberValue("difficulty_cap"),
+          budget_c0: numberValue("budget_c0"),
+          budget_c1: numberValue("budget_c1"),
+          max_rounds: numberValue("max_rounds", true),
+          strategy: form.elements["strategy"].value
+        },
+        n_trials: numberValue("n_trials", true),
+        base_seed: numberValue("base_seed", true),
+        compare_strategies: compareStrategies
+      };
+    }
+
+    function showSummary(response) {
+      summaryEl.innerHTML = "";
+      Object.entries(response.aggregates).forEach(([strategy, stats]) => {
+        const card = document.createElement("div");
+        card.className = "strategy-card";
+        card.innerHTML = `
+          <h3>${strategy}</h3>
+          <div>success_rate: ${stats.success_rate.toFixed(4)}</div>
+          <div>bankruptcy_rate: ${stats.bankruptcy_rate.toFixed(4)}</div>
+          <div>mean_survival_rounds: ${stats.mean_survival_rounds.toFixed(2)}</div>
+          <div>mean_net_profit: ${stats.mean_net_profit.toFixed(2)}</div>
+        `;
+        summaryEl.appendChild(card);
+      });
+    }
+
+    function drawScatter(response) {
+      const grouped = {};
+      response.plot_data.quadrant_points.forEach((point) => {
+        grouped[point.strategy] = grouped[point.strategy] || [];
+        grouped[point.strategy].push(point);
+      });
+      const keys = response.meta.compare_strategies ? strategyOrder : Object.keys(grouped);
+      const datasets = keys
+        .filter((k) => grouped[k] && grouped[k].length)
+        .map((strategy) => ({
+          label: strategy,
+          data: grouped[strategy].map((p) => ({ x: p.x, y: p.y, quadrant: p.quadrant })),
+          backgroundColor: strategyColors[strategy] || "#6b7280",
+          pointBackgroundColor: grouped[strategy].map((p) => quadrantColors[p.quadrant] || "#6b7280"),
+          pointRadius: 4
+        }));
+
+      if (scatterChart) scatterChart.destroy();
+      scatterChart = new Chart(document.getElementById("scatter-chart"), {
+        type: "scatter",
+        data: { datasets },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: "bottom" } },
+          scales: {
+            x: { title: { display: true, text: "capability_margin" } },
+            y: { title: { display: true, text: "funding_runway" } }
+          }
+        }
+      });
+    }
+
+    function buildHistogram(values, bins) {
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+      if (min === max) {
+        return { labels: [String(min)], edges: [min, min + 1] };
+      }
+      const width = (max - min) / bins;
+      const edges = Array.from({ length: bins + 1 }, (_, i) => min + i * width);
+      const labels = Array.from({ length: bins }, (_, i) => `${edges[i].toFixed(0)}-${edges[i + 1].toFixed(0)}`);
+      return { labels, edges };
+    }
+
+    function drawHistogram(response) {
+      const trialsByStrategy = {};
+      response.per_trial.forEach((item) => {
+        trialsByStrategy[item.strategy] = trialsByStrategy[item.strategy] || [];
+        trialsByStrategy[item.strategy].push(item.survival_rounds);
+      });
+      const values = response.plot_data.survival_histogram.values;
+      const bins = Math.max(5, Math.ceil(Math.log2(values.length) + 1));
+      const { labels, edges } = buildHistogram(values, bins);
+
+      const strategies = response.meta.compare_strategies ? strategyOrder : Object.keys(trialsByStrategy);
+      const datasets = strategies
+        .filter((strategy) => trialsByStrategy[strategy] && trialsByStrategy[strategy].length)
+        .map((strategy) => {
+          const counts = Array.from({ length: labels.length }, () => 0);
+          trialsByStrategy[strategy].forEach((v) => {
+            let idx = labels.length - 1;
+            for (let i = 0; i < labels.length; i++) {
+              if (v >= edges[i] && v < edges[i + 1]) {
+                idx = i;
+                break;
+              }
+            }
+            counts[idx] += 1;
+          });
+          return {
+            label: strategy,
+            data: counts,
+            backgroundColor: strategyColors[strategy] || "#6b7280"
+          };
+        });
+
+      if (histChart) histChart.destroy();
+      histChart = new Chart(document.getElementById("hist-chart"), {
+        type: "bar",
+        data: { labels, datasets },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: "bottom" } },
+          scales: {
+            x: { title: { display: true, text: "survival_rounds bin" } },
+            y: { title: { display: true, text: "count" }, beginAtZero: true }
+          }
+        }
+      });
+    }
+
+    async function runSimulation(compareStrategies) {
+      errorEl.textContent = "";
+      const payload = buildPayload(compareStrategies);
+      try {
+        const res = await fetch("/api/simulate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const body = await res.json();
+        if (!res.ok) {
+          errorEl.textContent = JSON.stringify(body.detail ?? body, null, 2);
+          return;
+        }
+        showSummary(body);
+        drawScatter(body);
+        drawHistogram(body);
+      } catch (err) {
+        errorEl.textContent = `Request failed: ${err}`;
+      }
+    }
+
+    document.getElementById("baseline-btn").addEventListener("click", () => {
+      setDefaults();
+      errorEl.textContent = "";
+      runSimulation(false);
+    });
+    document.getElementById("run-btn").addEventListener("click", () => runSimulation(false));
+    document.getElementById("compare-btn").addEventListener("click", () => runSimulation(true));
+    setDefaults();
+  </script>
+</body>
+</html>
