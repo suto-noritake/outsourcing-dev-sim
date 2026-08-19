@@ -49,6 +49,18 @@ Windowsダブルクリック起動ランチャー・チャートレイアウト�
 成果物品質を左右する」という仮説を実開発プロセスで裏付ける出来事があった（詳細は
 `model_manifest.md`）。
 
+### 製品開発プロセスの記録・一般化ドキュメント
+
+- [`docs/experiments/005_phase6_product_multiagent_case_study.md`](docs/experiments/005_phase6_product_multiagent_case_study.md)
+  — Phase6（v1新規開発＋v2フィードバック対応）の実施レポート。各ロールの判断・発見された
+  事実誤認とその修正・オーケストレーターの独立検証が効いた場面などを時系列でまとめた
+  ケーススタディ。
+- [`docs/multi_agent_dev_playbook.md`](docs/multi_agent_dev_playbook.md) — 今後、別の
+  製品を同じ4ロール・マルチエージェント開発プロセスで作る際に使える汎用プレイブック
+  （役割定義、モデル割当指針、発注プロンプトのテンプレート、SQL todo運用パターン、
+  オーケストレーターの独立検証チェックリスト、既知の落とし穴、クライアントフィードバック
+  対応のvNイテレーションパターン）。
+
 ## リポジトリ構成
 
 ```
