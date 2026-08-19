@@ -24,7 +24,8 @@ AIエージェントを用いた「技術受託開発」のシミュレーショ
   パイロット→スクリーニング→集中実験→統計解析の4段階プロセス）
 - [`docs/llm_experiments.md`](docs/llm_experiments.md) — Phase 4: LLMマルチエージェント実験
   （委託元・受託会社それぞれの社内複数ロール構造）
-- `docs/experiments/` — 実行した実験のrun manifest・結果記録（再現性用）
+- `docs/experiments/` — 実行した実験のrun manifest・結果記録（再現性用、001〜004）
+- [`docs/report.md`](docs/report.md) — **Phase 5: 最終レポート**（Phase2-4の統合結果・考察・限界）
 
 ## リポジトリ構成
 
