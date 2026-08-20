@@ -73,10 +73,23 @@ Bid Manager案に含まれていた3つの重大リスク——①1回の操作�
 （v2）・統計的リスクの査読（v3）に続き、「実際に動かして検証する」という一段深い検証手法が
 有効に機能した事例として記録している（詳細は`model_manifest.md`）。
 
+**v5アップデート（影響度ランキングの統計的信頼性向上＋ブランドデザイナー起用によるフルリデザイン）**:
+「影響度ランキングの試行回数を増やすか、時間のかからない別の方法で傾向を判断できるようにしてほしい」
+「最上級ブランドデザイナーエージェントを連れてきてデザインを確定させよう」という要望を受け、
+既存4ロールに加えて**新設の5番目のロール「Brand Designer」**（`gpt-5.4`/xhigh）を投入した。
+影響度ランキングは呼び出し回数（21回）・n_trials上限（80）を変えずに、Wilson score interval・
+McNemar検定（継続性補正あり）による統計的信頼性判定を追加し、非有意な結果を「効果なし」ではなく
+「この試行数では判別不能」と誠実に表現するよう改修した（`v5_architect_log.md`）。デザインは
+Brand Designerが白紙から「インタラクティブな調査報告書」というコンセプトで配色・タイポグラフィ・
+コンポーネントスタイルを確定し、Implementerが既存の情報構造・全機能を維持したまま実装した
+（`v5_brand_designer_log.md`）。技術検証（Architect）と創造的意思決定（Brand Designer）を
+専任ロールとして分離し、Bid Manager完了後に並行実行するパイプラインを初めて採用した
+（詳細は`model_manifest.md`）。
+
 ### 製品開発プロセスの記録・一般化ドキュメント
 
 - [`docs/experiments/005_phase6_product_multiagent_case_study.md`](docs/experiments/005_phase6_product_multiagent_case_study.md)
-  — Phase6（v1新規開発＋v2/v3/v4フィードバック対応）の実施レポート。各ロールの判断・発見された
+  — Phase6（v1新規開発＋v2/v3/v4/v5フィードバック対応）の実施レポート。各ロールの判断・発見された
   事実誤認や不健全な設計案とその修正・オーケストレーターの独立検証が効いた場面などを
   時系列でまとめたケーススタディ。
 - [`docs/multi_agent_dev_playbook.md`](docs/multi_agent_dev_playbook.md) — 今後、別の

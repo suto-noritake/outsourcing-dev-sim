@@ -7,125 +7,496 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <style>
     :root {
-      --color-bg: #f8fafc;
+      --color-bg: #eef2f6;
+      --color-bg-subtle: #f7f9fb;
       --color-panel: #ffffff;
-      --color-border: #e2e8f0;
-      --color-text: #334155;
-      --color-heading: #0f172a;
-      --color-muted: #64748b;
-      --color-accent: #2563eb;
-      --color-accent-hover: #1d4ed8;
-      --shadow-panel: 0 1px 2px rgba(15, 23, 42, 0.06), 0 4px 10px rgba(15, 23, 42, 0.05);
-      --radius-panel: 12px;
-      --radius-card: 10px;
+      --color-panel-muted: #f8fafc;
+      --color-border: #d6dfe8;
+      --color-border-strong: #b7c4d3;
+      --color-text: #243241;
+      --color-heading: #0f1b2d;
+      --color-muted: #5d6b7b;
+      --color-subtle: #7b8794;
+      --color-accent: #3154ff;
+      --color-accent-hover: #2847d8;
+      --color-accent-active: #1f38b5;
+      --color-accent-soft: #e7ecff;
+      --color-focus-ring: rgba(49, 84, 255, 0.24);
+      --color-info: #0e7490;
+      --color-info-soft: #e3f3f7;
+      --color-success: #167c55;
+      --color-success-soft: #e5f4ec;
+      --color-warning: #8f5a00;
+      --color-warning-soft: #fff3de;
+      --color-error: #c53d46;
+      --color-error-soft: #fdecee;
+      --color-quadrant-1: #138a5b;
+      --color-quadrant-2: #c27a12;
+      --color-quadrant-3: #2b6ef2;
+      --color-quadrant-4: #c5424b;
+      --color-strategy-conservative: #5b4bdb;
+      --color-strategy-cost-optimal: #0f8b83;
+      --color-strategy-adaptive: #c9651e;
+      --color-gridline: rgba(36, 50, 65, 0.12);
+      --color-input-bg: #ffffff;
+      --color-input-border: #c8d3de;
+      --color-input-border-hover: #9eb1c5;
+      --color-input-border-focus: #3154ff;
+      --color-slider-track: #dce4ee;
+      --color-slider-fill: #3154ff;
+      --color-slider-thumb: #ffffff;
+      --color-table-head-bg: #edf2f8;
+      --color-row-alt: #f9fbfd;
+      --color-row-hover: #eef4ff;
+      --color-note-bg: #f4f8fc;
+      --color-note-border: #d9e5f2;
+      --color-badge-neutral-bg: #eef2f7;
+      --color-badge-neutral-text: #445469;
+      --color-badge-neutral-border: #d5dee8;
+      --color-badge-info-bg: #e7ecff;
+      --color-badge-info-text: #2447d5;
+      --color-badge-info-border: #cbd6ff;
+      --color-badge-success-bg: #e5f4ec;
+      --color-badge-success-text: #16664a;
+      --color-badge-success-border: #c0e1cf;
+      --color-badge-warning-bg: #fff3de;
+      --color-badge-warning-text: #8f5a00;
+      --color-badge-warning-border: #f1d6a5;
+      --color-badge-danger-bg: #fdecee;
+      --color-badge-danger-text: #a8333b;
+      --color-badge-danger-border: #f5c6cd;
+      --font-family-ui: "Inter", "Segoe UI", "Yu Gothic UI", "Hiragino Sans", Meiryo, "Noto Sans JP", sans-serif;
+      --font-family-mono: "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+      --font-size-2xs: 0.75rem;
+      --font-size-xs: 0.8125rem;
+      --font-size-sm: 0.875rem;
+      --font-size-md: 0.9375rem;
+      --font-size-lg: 1rem;
+      --font-size-xl: 1.125rem;
+      --font-size-2xl: 1.375rem;
+      --font-size-3xl: 1.875rem;
+      --font-size-metric: 1.75rem;
+      --line-height-tight: 1.3;
+      --line-height-body: 1.55;
+      --line-height-loose: 1.7;
+      --font-weight-regular: 400;
+      --font-weight-medium: 500;
+      --font-weight-semibold: 600;
+      --font-weight-bold: 700;
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.25rem;
+      --space-6: 1.5rem;
+      --space-8: 2rem;
+      --space-10: 2.5rem;
+      --space-12: 3rem;
+      --radius-panel: 1rem;
+      --radius-card: 0.875rem;
+      --radius-control: 0.625rem;
+      --radius-badge: 999px;
+      --border-width: 1px;
+      --border-width-strong: 2px;
+      --shadow-panel: 0 1px 2px rgba(15, 23, 42, 0.04), 0 10px 24px rgba(15, 23, 42, 0.06);
+      --shadow-raised: 0 8px 20px rgba(15, 23, 42, 0.08);
+      --shadow-focus: 0 0 0 3px rgba(49, 84, 255, 0.24);
+      --page-padding: 1.5rem;
+      --panel-gap: 1.25rem;
+      --panel-padding: 1.25rem;
+      --card-padding: 1rem;
+      --control-height: 2.5rem;
+      --table-cell-y: 0.625rem;
+      --table-cell-x: 0.75rem;
     }
+
+    * { box-sizing: border-box; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Yu Gothic UI", Meiryo, Roboto, "Noto Sans JP", sans-serif;
+      font-family: var(--font-family-ui);
       margin: 0;
-      padding: 24px;
+      padding: var(--page-padding);
       background: var(--color-bg);
       color: var(--color-text);
-      font-size: 14px;
-      line-height: 1.6;
+      font-size: var(--font-size-md);
+      line-height: var(--line-height-body);
+      font-variant-numeric: tabular-nums;
     }
-    h1 { font-size: 24px; font-weight: 700; color: var(--color-heading); margin: 0 0 16px; }
+    h1 {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold);
+      line-height: 1.2;
+      color: var(--color-heading);
+      margin: 0 0 var(--space-5);
+    }
     h2 {
-      font-size: 17px; font-weight: 700; color: var(--color-heading);
-      margin: 0 0 12px; padding-left: 10px; border-left: 4px solid var(--color-accent);
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+      line-height: 1.35;
+      color: var(--color-heading);
+      margin: 0 0 var(--space-4);
     }
-    h3 { font-size: 15px; font-weight: 700; color: var(--color-heading); margin: 0 0 4px; }
+    h3 {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      line-height: 1.4;
+      color: var(--color-heading);
+      margin: 0 0 var(--space-2);
+    }
 
     .panel {
-      border: 1px solid var(--color-border); border-radius: var(--radius-panel);
-      padding: 16px; margin-bottom: 16px; background: var(--color-panel);
+      border: var(--border-width) solid var(--color-border);
+      border-radius: var(--radius-panel);
+      padding: var(--panel-padding);
+      margin-bottom: var(--panel-gap);
+      background: var(--color-panel);
       box-shadow: var(--shadow-panel);
     }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; }
-    label { display: flex; flex-direction: column; font-size: 12px; gap: 4px; }
-    .field-label { font-weight: 600; color: var(--color-heading); }
-    .field-label small { font-weight: 400; color: var(--color-muted); }
-    .field-input-pair { display: grid; gap: 4px; }
-    input[type="range"] { padding: 0; accent-color: var(--color-accent); }
-    input, select { padding: 6px; font-size: 13px; border: 1px solid #cbd5e1; border-radius: 6px; color: var(--color-text); }
-    .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; align-items: center; }
-    .title-with-badge { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-3); }
+    label { display: flex; flex-direction: column; font-size: var(--font-size-xs); gap: var(--space-2); }
+    .field-label { font-weight: var(--font-weight-semibold); color: var(--color-heading); line-height: 1.45; }
+    .field-label small { font-weight: var(--font-weight-regular); color: var(--color-muted); }
+    .field-input-pair { display: grid; gap: 6px; }
+
+    input,
+    select {
+      width: 100%;
+      height: var(--control-height);
+      padding: 0 var(--space-3);
+      font-size: var(--font-size-sm);
+      border: var(--border-width) solid var(--color-input-border);
+      border-radius: var(--radius-control);
+      color: var(--color-text);
+      background: var(--color-input-bg);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+    }
+    input:hover,
+    select:hover { border-color: var(--color-input-border-hover); }
+    input:focus-visible,
+    select:focus-visible {
+      outline: none;
+      border-color: var(--color-input-border-focus);
+      box-shadow: var(--shadow-focus);
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      padding: 0;
+      height: var(--control-height);
+      border: none;
+      background: transparent;
+      accent-color: var(--color-slider-fill);
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 6px;
+      border-radius: var(--radius-badge);
+      background: var(--color-slider-track);
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      margin-top: -6px;
+      border-radius: 50%;
+      border: 2px solid var(--color-slider-fill);
+      background: var(--color-slider-thumb);
+      transition: transform 0.12s ease;
+    }
+    input[type="range"]::-moz-range-track {
+      height: 6px;
+      border-radius: var(--radius-badge);
+      background: var(--color-slider-track);
+    }
+    input[type="range"]::-moz-range-progress {
+      height: 6px;
+      border-radius: var(--radius-badge);
+      background: var(--color-slider-fill);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid var(--color-slider-fill);
+      background: var(--color-slider-thumb);
+      transition: transform 0.12s ease;
+    }
+    input[type="range"]:hover::-webkit-slider-thumb,
+    input[type="range"]:hover::-moz-range-thumb { transform: scale(1.11); }
+    input[type="range"]:focus-visible { outline: none; }
+    input[type="range"]:focus-visible::-webkit-slider-thumb,
+    input[type="range"]:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 3px var(--color-focus-ring); }
+
+    .actions { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-2); align-items: center; }
+    .title-with-badge { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); flex-wrap: wrap; }
     .run-mode-badge {
-      font-size: 11px;
-      font-weight: 700;
-      border-radius: 999px;
-      padding: 2px 8px;
-      border: 1px solid transparent;
-      min-height: 20px;
+      min-height: 24px;
       display: inline-flex;
       align-items: center;
+      border-radius: var(--radius-badge);
+      padding: 0 10px;
+      border: 1px solid var(--color-badge-info-border);
+      font-size: var(--font-size-2xs);
+      font-weight: var(--font-weight-bold);
     }
-    .run-mode-badge.is-preview { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
-    .run-mode-badge.is-precise { background: #1d4ed8; color: #fff; border-color: #1d4ed8; }
-    .summary-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+    .run-mode-badge.is-preview { background: var(--color-badge-info-bg); color: var(--color-badge-info-text); }
+    .run-mode-badge.is-precise { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
+    .run-mode-badge:empty { display: none; }
+    .summary-grid { display: grid; gap: var(--space-3); grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
     .strategy-card {
-      border: 1px solid var(--color-border); border-radius: var(--radius-card);
-      padding: 12px; background: #fff; box-shadow: var(--shadow-panel);
+      border: var(--border-width) solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: var(--card-padding);
+      background: var(--color-panel-muted);
     }
-    .metric-item { margin-top: 8px; border-top: 1px dashed var(--color-border); padding-top: 8px; }
-    .metric-label { font-weight: 600; font-size: 12.5px; color: var(--color-heading); }
-    .metric-label small { font-weight: 400; color: var(--color-muted); }
-    .metric-value { font-size: 22px; font-weight: 700; color: var(--color-heading); margin-top: 2px; }
-    .metric-help { font-size: 12px; color: var(--color-muted); margin-top: 2px; line-height: 1.45; }
+    .metric-item { margin-top: var(--space-2); border-top: var(--border-width) solid var(--color-border); padding-top: var(--space-2); }
+    .metric-label { font-weight: var(--font-weight-semibold); font-size: var(--font-size-xs); color: var(--color-heading); }
+    .metric-label small { font-weight: var(--font-weight-regular); color: var(--color-muted); }
+    .metric-value { font-size: var(--font-size-metric); font-weight: var(--font-weight-bold); line-height: 1.15; color: var(--color-heading); margin-top: 2px; }
+    .metric-help { font-size: var(--font-size-xs); color: var(--color-muted); margin-top: 2px; line-height: 1.55; }
 
     button {
-      border-radius: 8px; border: 1px solid transparent; cursor: pointer;
-      font-weight: 600; padding: 8px 14px; font-size: 13px;
+      min-height: var(--control-height);
+      border-radius: var(--radius-control);
+      border: var(--border-width) solid var(--color-input-border);
+      cursor: pointer;
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-sm);
+      padding: 0 var(--space-4);
+      background: #fff;
+      color: var(--color-heading);
+      transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+    }
+    button:hover { background: var(--color-accent-soft); border-color: var(--color-input-border-hover); }
+    button:active { transform: translateY(1px); }
+    button:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
+    button:disabled {
+      cursor: not-allowed;
+      background: var(--color-bg-subtle);
+      color: var(--color-subtle);
+      border-color: var(--color-border);
+      box-shadow: none;
+      transform: none;
     }
     #run-btn, #compare-btn, #sensitivity-run-btn, #reverse-stage1-run-btn, #reverse-stage2-run-btn {
       background: var(--color-accent);
       color: #fff;
+      border-color: transparent;
+      box-shadow: var(--shadow-raised);
     }
     #run-btn:hover, #compare-btn:hover, #sensitivity-run-btn:hover, #reverse-stage1-run-btn:hover, #reverse-stage2-run-btn:hover {
       background: var(--color-accent-hover);
+      border-color: transparent;
     }
-    #baseline-btn { background: #fff; border-color: #cbd5e1; color: var(--color-text); }
-    #baseline-btn:hover { background: #f1f5f9; }
+    #run-btn:active, #compare-btn:active, #sensitivity-run-btn:active, #reverse-stage1-run-btn:active, #reverse-stage2-run-btn:active {
+      background: var(--color-accent-active);
+    }
+    #baseline-btn,
+    .apply-reverse-btn {
+      background: #fff;
+      border-color: var(--color-input-border);
+      color: var(--color-heading);
+      box-shadow: none;
+    }
+    #baseline-btn:hover,
+    .apply-reverse-btn:hover { background: var(--color-accent-soft); }
 
-    .error { color: #b91c1c; white-space: pre-wrap; margin-top: 8px; }
-    .small { font-size: 12px; color: var(--color-muted); line-height: 1.5; }
-    .chart-container { position: relative; height: 400px; width: 100%; }
+    .error {
+      margin-top: var(--space-2);
+      padding: 12px 14px;
+      border-radius: var(--radius-control);
+      border: 1px solid var(--color-badge-danger-border);
+      background: var(--color-error-soft);
+      color: var(--color-error);
+      white-space: pre-wrap;
+      font-size: var(--font-size-xs);
+      line-height: 1.55;
+    }
+    .error:empty { display: none; }
+    .small { font-size: var(--font-size-xs); color: var(--color-muted); line-height: 1.55; }
+    .small-note {
+      margin-top: var(--space-2);
+      padding: 10px 12px;
+      border-radius: var(--radius-control);
+      border: 1px solid var(--color-note-border);
+      background: var(--color-note-bg);
+      color: var(--color-text);
+    }
+    .small-note:empty { display: none; }
+    .small-warning,
+    .reverse-disclaimer {
+      margin-top: var(--space-2);
+      padding: 12px 14px;
+      border-radius: var(--radius-control);
+      border: 1px solid var(--color-badge-warning-border);
+      border-left: 3px solid var(--color-warning);
+      background: var(--color-warning-soft);
+      color: var(--color-text);
+      line-height: 1.7;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 400px;
+      width: 100%;
+      border: var(--border-width) solid var(--color-border);
+      border-radius: var(--radius-card);
+      background: #fff;
+      padding: var(--space-3);
+    }
     .chart-container canvas { max-height: none; }
-    .axis-help { margin: 10px 0 8px; padding: 8px; border-radius: 6px; background: #eef2ff; font-size: 12px; line-height: 1.5; }
-    .quadrant-legend { margin-top: 8px; display: grid; gap: 6px; }
-    .quadrant-item { border: 1px solid var(--color-border); border-radius: 6px; background: #fff; padding: 8px; font-size: 12px; line-height: 1.45; }
-    .quadrant-title { font-weight: 700; display: flex; align-items: center; gap: 6px; }
-    .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 999px; }
-    .shape-legend-note { font-size: 12px; color: var(--color-muted); margin-bottom: 4px; }
+    .axis-help {
+      margin: var(--space-3) 0 var(--space-2);
+      padding: 10px 12px;
+      border-radius: var(--radius-control);
+      border: 1px solid var(--color-note-border);
+      background: var(--color-note-bg);
+      font-size: var(--font-size-xs);
+      line-height: 1.55;
+      color: var(--color-text);
+    }
+    .quadrant-legend { margin-top: var(--space-2); display: grid; gap: var(--space-2); }
+    .quadrant-item {
+      border: var(--border-width) solid var(--color-border);
+      border-radius: var(--radius-control);
+      background: var(--color-panel-muted);
+      padding: 10px 12px;
+      font-size: var(--font-size-xs);
+      line-height: 1.55;
+    }
+    .quadrant-title { font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); display: flex; align-items: center; gap: 6px; }
+    .swatch { display: inline-block; width: 11px; height: 11px; border-radius: 999px; }
+    .shape-legend-note { font-size: var(--font-size-xs); color: var(--color-muted); margin-bottom: var(--space-1); }
 
-    .quadrant-dist-title { font-size: 12.5px; font-weight: 600; color: var(--color-heading); margin-top: 10px; }
+    .quadrant-dist-title { font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold); color: var(--color-heading); margin-top: var(--space-2); }
     .quadrant-dist-row {
-      display: grid; grid-template-columns: 12px 108px 1fr 44px; align-items: center;
-      gap: 6px; margin-top: 4px; font-size: 12px;
+      display: grid;
+      grid-template-columns: 12px 108px 1fr 44px;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+      font-size: var(--font-size-xs);
     }
-    .quadrant-dist-bar-track { background: #f1f5f9; border-radius: 999px; height: 8px; overflow: hidden; }
-    .quadrant-dist-bar-fill { height: 100%; border-radius: 999px; }
+    .quadrant-dist-bar-track { background: var(--color-slider-track); border-radius: var(--radius-badge); height: 8px; overflow: hidden; }
+    .quadrant-dist-bar-fill { height: 100%; border-radius: var(--radius-badge); }
     .tendency-text {
-      font-size: 12.5px; color: var(--color-text); margin-top: 10px;
-      padding-top: 8px; border-top: 1px dashed var(--color-border); line-height: 1.5;
+      font-size: var(--font-size-xs);
+      color: var(--color-text);
+      margin-top: var(--space-2);
+      padding-top: var(--space-2);
+      border-top: var(--border-width) solid var(--color-border);
+      line-height: 1.55;
     }
 
-    .sensitivity-panel .intro { font-size: 12.5px; color: var(--color-muted); line-height: 1.6; margin-bottom: 8px; }
-    .sensitivity-table { border-collapse: collapse; width: 100%; font-size: 12.5px; margin-top: 8px; }
-    .sensitivity-table th, .sensitivity-table td { border: 1px solid var(--color-border); padding: 6px 8px; text-align: right; }
-    .sensitivity-table th:first-child, .sensitivity-table td:first-child { text-align: left; }
-    .reverse-calc-card { border: 1px solid var(--color-border); border-radius: var(--radius-card); padding: 12px; margin-top: 10px; }
-    .reverse-calc-card h3 { margin-bottom: 8px; }
+    .sensitivity-panel .intro { font-size: var(--font-size-xs); color: var(--color-muted); line-height: 1.6; margin-bottom: var(--space-2); }
+    #sensitivity-result, #reverse-stage1-result { margin-top: var(--space-2); overflow-x: auto; }
+    .sensitivity-table {
+      border-collapse: separate;
+      border-spacing: 0;
+      width: 100%;
+      min-width: 820px;
+      font-size: var(--font-size-xs);
+      border: var(--border-width) solid var(--color-border);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+    }
+    .sensitivity-table th, .sensitivity-table td {
+      padding: var(--table-cell-y) var(--table-cell-x);
+      text-align: right;
+      border-bottom: var(--border-width) solid var(--color-border);
+      vertical-align: top;
+    }
+    .sensitivity-table th:not(:first-child), .sensitivity-table td:not(:first-child) { border-left: var(--border-width) solid rgba(183, 196, 211, 0.45); }
+    .sensitivity-table th {
+      background: var(--color-table-head-bg);
+      color: var(--color-heading);
+      font-weight: var(--font-weight-semibold);
+      line-height: 1.45;
+    }
+    .sensitivity-table tr:last-child td { border-bottom: none; }
+    .sensitivity-table tbody tr:nth-child(even) { background: var(--color-row-alt); }
+    .sensitivity-table tbody tr:hover { background: var(--color-row-hover); }
+    .sensitivity-table th:first-child,
+    .sensitivity-table td:first-child { text-align: left; }
+
+    .badge {
+      min-height: 24px;
+      display: inline-flex;
+      align-items: center;
+      border-radius: var(--radius-badge);
+      padding: 0 10px;
+      font-size: var(--font-size-2xs);
+      font-weight: var(--font-weight-bold);
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .badge--success {
+      background: var(--color-badge-success-bg);
+      color: var(--color-badge-success-text);
+      border-color: var(--color-badge-success-border);
+    }
+    .badge--warning {
+      background: var(--color-badge-warning-bg);
+      color: var(--color-badge-warning-text);
+      border-color: var(--color-badge-warning-border);
+    }
+    .badge--neutral {
+      background: var(--color-badge-neutral-bg);
+      color: var(--color-badge-neutral-text);
+      border-color: var(--color-badge-neutral-border);
+    }
+
+    .reverse-calc-card {
+      border: var(--border-width) solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: var(--card-padding);
+      margin-top: var(--space-3);
+      background: var(--color-panel-muted);
+    }
+    .reverse-calc-card h3 { margin-bottom: var(--space-2); }
     .reverse-calc-disabled { opacity: 0.6; }
-    .reverse-params { display: flex; flex-wrap: wrap; gap: 10px; margin: 8px 0; }
-    .reverse-param-check { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; }
-    .reverse-reco-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 8px; margin-top: 8px; }
-    .reverse-reco-card { border: 1px solid var(--color-border); border-radius: 8px; padding: 10px; background: #fff; }
-    .reverse-reco-card ul { margin: 6px 0 8px 16px; padding: 0; }
+    .reverse-params { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: var(--space-2) 0; align-items: flex-start; }
+    .reverse-param-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: var(--font-size-xs);
+      color: var(--color-text);
+      background: #fff;
+      border: var(--border-width) solid var(--color-border);
+      border-radius: var(--radius-control);
+      padding: 6px 10px;
+    }
+    .reverse-reco-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-2); margin-top: var(--space-2); }
+    .reverse-reco-card {
+      border: var(--border-width) solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: var(--card-padding);
+      background: var(--color-panel-muted);
+    }
+    .reverse-reco-card ul { margin: var(--space-2) 0 var(--space-2) 16px; padding: 0; }
     .reverse-reco-card li { margin: 2px 0; }
-    .reverse-disclaimer { margin-top: 8px; }
+    .reverse-confidence-help { flex-basis: 100%; margin: 0 0 var(--space-1); }
+
+    @media (max-width: 960px) {
+      .summary-grid,
+      .reverse-reco-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      body { padding: 16px; }
+      .panel { padding: 16px; }
+    }
+
+    @media (max-width: 640px) {
+      h1 { font-size: 26px; }
+      h2 { font-size: 17px; }
+      .chart-container { height: 320px; }
+    }
 
     @media (max-width: 480px) {
+      body { padding: 12px; }
       .chart-container { height: 280px; }
     }
   </style>
@@ -277,7 +648,7 @@
         <button type="button" id="run-btn">シミュレーション実行</button>
         <button type="button" id="compare-btn">3戦略を比較</button>
       </div>
-      <p class="small">比較モードでは戦略の選択は無視され、保守的・コスト最適・適応型の3戦略をまとめて実行します。</p>
+      <p class="small small-note">比較モードでは戦略の選択は無視され、保守的・コスト最適・適応型の3戦略をまとめて実行します。</p>
       <div id="error" class="error"></div>
     </form>
   </div>
@@ -297,16 +668,16 @@
     </p>
     <div class="actions">
       <button type="button" id="sensitivity-run-btn">感度チェックを実行</button>
-      <span id="sensitivity-estimate" class="small"></span>
+      <span id="sensitivity-estimate" class="small small-note"></span>
     </div>
-    <div id="sensitivity-estimate-note" class="small"></div>
-    <div id="sensitivity-status" class="small"></div>
+    <div id="sensitivity-estimate-note" class="small small-note"></div>
+    <div id="sensitivity-status" class="small small-note"></div>
     <div id="sensitivity-result"></div>
   </div>
 
   <div class="panel">
     <h2>独走勝ち組型への逆算（2段階）</h2>
-    <p class="small">
+    <p class="small small-note">
       目的関数は「独走勝ち組型（dominant_leader）に入る割合」です。平均純利益は参考情報として併記します。<br />
       各ラウンドで消費される乱数の「順番」自体は、パラメータ値や成功・失敗の結果に関わらず常に同じです
       （コスト用の対数正規乱数1回→成功判定の一様乱数1回、の順）。したがって、比較対象の2つの設定が
@@ -321,10 +692,10 @@
       <h3>① 影響度ランキングを実行</h3>
       <div class="actions">
         <button type="button" id="reverse-stage1-run-btn">影響度ランキングを実行</button>
-        <span id="reverse-stage1-estimate" class="small"></span>
+        <span id="reverse-stage1-estimate" class="small small-note"></span>
       </div>
-      <div id="reverse-stage1-estimate-note" class="small"></div>
-      <div id="reverse-stage1-status" class="small"></div>
+      <div id="reverse-stage1-estimate-note" class="small small-note"></div>
+      <div id="reverse-stage1-status" class="small small-note"></div>
       <div id="reverse-stage1-result"></div>
     </div>
 
@@ -338,13 +709,13 @@
         3つ以上のパラメータが組み合わさって初めて効果が出るようなケースは検出できません。あくまで
         「主要な2要因を動かした場合の目安」としてご利用ください。
       </p>
-      <div id="reverse-param-select" class="reverse-params small"></div>
+      <div id="reverse-param-select" class="reverse-params"></div>
       <div class="actions">
         <button type="button" id="reverse-stage2-run-btn" disabled>組み合わせ探索でおすすめ設定を出す</button>
-        <span id="reverse-stage2-estimate" class="small"></span>
+        <span id="reverse-stage2-estimate" class="small small-note"></span>
       </div>
-      <div id="reverse-stage2-estimate-note" class="small"></div>
-      <div id="reverse-stage2-status" class="small"></div>
+      <div id="reverse-stage2-estimate-note" class="small small-note"></div>
+      <div id="reverse-stage2-status" class="small small-note"></div>
       <div id="reverse-stage2-result"></div>
     </div>
   </div>
@@ -444,15 +815,15 @@
       }
     };
     const quadrantColors = {
-      dominant_leader: "#16a34a",
-      cash_starved_specialist: "#f59e0b",
-      deep_pockets_shallow_skills: "#2563eb",
-      exit_candidate: "#dc2626"
+      dominant_leader: "#138a5b",
+      cash_starved_specialist: "#c27a12",
+      deep_pockets_shallow_skills: "#2b6ef2",
+      exit_candidate: "#c5424b"
     };
     const strategyColors = {
-      conservative: "#8b5cf6",
-      cost_optimal: "#14b8a6",
-      adaptive: "#f97316"
+      conservative: "#5b4bdb",
+      cost_optimal: "#0f8b83",
+      adaptive: "#c9651e"
     };
     const strategyPointStyle = {
       conservative: "circle",
@@ -476,6 +847,25 @@
     const REVERSE_STAGE2_PREVIEW_CALLS = 9;
     const REVERSE_STAGE2_PRECISE_CALLS = 3;
     const REVERSE_STAGE2_CALLS = REVERSE_STAGE2_PREVIEW_CALLS + REVERSE_STAGE2_PRECISE_CALLS;
+    const MCNEMAR_Z_THRESHOLD = 1.96;
+    const NON_MONOTONIC_DIRECTION = "方向が一定しない（試行回数が少なく、乱数ノイズの影響が大きい可能性）";
+    const CONFIDENCE_META = {
+      significant: {
+        label: "有意な方向性あり",
+        detail: "低vs基準または高vs基準の差が、対応のある比率差の検定（McNemar検定）で統計的に有意でした（p<0.05）。",
+        badgeClass: "badge--success"
+      },
+      uncertain: {
+        label: "傾向はあるが不確実",
+        detail: "3点の並びには方向性が見られますが、この試行数（最大80件）では対応のある比率差の検定で有意差を確認できませんでした。効果がないという意味ではなく、この粗い探索条件では判別できないという意味です。",
+        badgeClass: "badge--warning"
+      },
+      unclear: {
+        label: "傾向不明瞭",
+        detail: "低い値・高い値で変化の向きが一致せず、一貫した傾向を読み取れませんでした。",
+        badgeClass: "badge--neutral"
+      }
+    };
 
     const quadrantThresholdPlugin = {
       id: "quadrantThresholds",
@@ -485,9 +875,9 @@
         const xPix = scales.x.getPixelForValue(0);
         const yPix = scales.y.getPixelForValue(5);
         ctx.save();
-        ctx.strokeStyle = "rgba(100, 116, 139, 0.6)";
-        ctx.setLineDash([4, 4]);
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = cssVar("--color-border-strong", "#b7c4d3");
+        ctx.setLineDash([5, 5]);
+        ctx.lineWidth = 1.25;
         if (xPix >= chartArea.left && xPix <= chartArea.right) {
           ctx.beginPath();
           ctx.moveTo(xPix, chartArea.top);
@@ -555,6 +945,11 @@
       const g = parseInt(h.substring(2, 4), 16);
       const b = parseInt(h.substring(4, 6), 16);
       return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    function cssVar(name, fallback) {
+      const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      return value || fallback;
     }
 
     function stepDigits(step) {
@@ -691,7 +1086,7 @@
       reverseStage2ResultEl.innerHTML = "";
       reverseStage1StatusEl.textContent = "";
       reverseStage2StatusEl.textContent = "";
-      reverseParamSelectEl.innerHTML = "<span>段階①を実行すると、上位4パラメータ候補から2つを選べます。</span>";
+      reverseParamSelectEl.innerHTML = "<span class=\"small small-note\">段階①を実行すると、上位4パラメータ候補から2つを選べます。</span>";
       updateSensitivityEstimate();
       updateReverseEstimates();
       updateActionButtons();
@@ -777,15 +1172,77 @@
       return { low, base, high, deltaLowPct, deltaHighPct, maxAbsDeltaPct, direction };
     }
 
-    function summarizeQuadrantSweep(low, base, high) {
+    function wilsonScoreInterval(k, n, z = MCNEMAR_Z_THRESHOLD) {
+      if (!Number.isFinite(n) || n <= 0) return { low: 0, high: 0 };
+      const safeK = Math.min(Math.max(0, Number(k) || 0), n);
+      const pHat = safeK / n;
+      const z2 = z * z;
+      const denom = 1 + (z2 / n);
+      const center = (pHat + (z2 / (2 * n))) / denom;
+      const half = (z / denom) * Math.sqrt((pHat * (1 - pHat) / n) + (z2 / (4 * n * n)));
+      return {
+        low: Math.max(0, (center - half) * 100),
+        high: Math.min(100, (center + half) * 100)
+      };
+    }
+
+    function mcnemarZ(hitsA, hitsB) {
+      let b = 0;
+      let c = 0;
+      let paired = 0;
+      hitsA.forEach((aHit, seed) => {
+        if (!hitsB.has(seed)) return;
+        paired += 1;
+        const bHit = hitsB.get(seed);
+        if (aHit && !bHit) b += 1;
+        if (!aHit && bHit) c += 1;
+      });
+      if (b + c === 0) return { z: 0, b, c, paired };
+      const z = (Math.abs(b - c) - 1) / Math.sqrt(b + c);
+      return { z, b, c, paired };
+    }
+
+    function summarizeQuadrantSweep(lowPoint, basePoint, highPoint) {
+      const low = Number(lowPoint?.pct ?? 0);
+      const base = Number(basePoint?.pct ?? 0);
+      const high = Number(highPoint?.pct ?? 0);
       const deltaLowPt = low - base;
       const deltaHighPt = high - base;
       const maxAbsDeltaPt = Math.max(Math.abs(deltaLowPt), Math.abs(deltaHighPt));
       let direction;
       if (high > base && base > low) direction = "増加方向（値を上げると独走勝ち組型の割合が増える傾向）";
       else if (high < base && base < low) direction = "減少方向（値を上げると独走勝ち組型の割合が減る傾向）";
-      else direction = "方向が一定しない（試行回数が少なく、乱数ノイズの影響が大きい可能性）";
-      return { low, base, high, deltaLowPt, deltaHighPt, maxAbsDeltaPt, direction };
+      else direction = NON_MONOTONIC_DIRECTION;
+
+      const ciLow = wilsonScoreInterval(lowPoint?.hitsCount ?? 0, lowPoint?.n ?? 0);
+      const ciBase = wilsonScoreInterval(basePoint?.hitsCount ?? 0, basePoint?.n ?? 0);
+      const ciHigh = wilsonScoreInterval(highPoint?.hitsCount ?? 0, highPoint?.n ?? 0);
+      const lowBase = mcnemarZ(lowPoint?.hits ?? new Map(), basePoint?.hits ?? new Map());
+      const highBase = mcnemarZ(highPoint?.hits ?? new Map(), basePoint?.hits ?? new Map());
+      const sigLowBase = Math.abs(lowBase.z) >= MCNEMAR_Z_THRESHOLD;
+      const sigHighBase = Math.abs(highBase.z) >= MCNEMAR_Z_THRESHOLD;
+      const isMonotonic = direction !== NON_MONOTONIC_DIRECTION;
+      const confidenceTier = !isMonotonic ? "unclear" : (sigLowBase || sigHighBase ? "significant" : "uncertain");
+      const confidence = CONFIDENCE_META[confidenceTier];
+
+      return {
+        low,
+        base,
+        high,
+        deltaLowPt,
+        deltaHighPt,
+        maxAbsDeltaPt,
+        direction,
+        confidenceTier,
+        confidenceLabel: confidence.label,
+        confidenceDetail: confidence.detail,
+        confidenceBadgeClass: confidence.badgeClass,
+        zLowBase: lowBase.z,
+        zHighBase: highBase.z,
+        ciLow,
+        ciBase,
+        ciHigh
+      };
     }
 
     function showSummary(response) {
@@ -874,8 +1331,8 @@
           pointBackgroundColor: grouped[strategy].map(
             (p) => withAlpha(quadrantColors[p.quadrant] || "#6b7280", 0.55)
           ),
-          pointBorderColor: "rgba(30, 41, 59, 0.55)",
-          pointBorderWidth: 1.25,
+          pointBorderColor: withAlpha("#0f1b2d", 0.55),
+          pointBorderWidth: 1.3,
           pointRadius: 5,
           pointHoverRadius: 7,
           pointHoverBorderWidth: 2
@@ -892,6 +1349,10 @@
           plugins: {
             legend: { display: false },
             tooltip: {
+              backgroundColor: "#0f1b2d",
+              titleColor: "#ffffff",
+              bodyColor: "#ffffff",
+              bodyFont: { size: 12 },
               callbacks: {
                 label: (context) => {
                   const point = context.raw || {};
@@ -907,8 +1368,16 @@
             }
           },
           scales: {
-            x: { title: { display: true, text: "技術優位度 (capability_margin)" } },
-            y: { title: { display: true, text: "資金体力 (funding_runway)" } }
+            x: {
+              title: { display: true, text: "技術優位度 (capability_margin)", color: "#0f1b2d" },
+              ticks: { color: "#243241" },
+              grid: { color: "rgba(36, 50, 65, 0.12)" }
+            },
+            y: {
+              title: { display: true, text: "資金体力 (funding_runway)", color: "#0f1b2d" },
+              ticks: { color: "#243241" },
+              grid: { color: "rgba(36, 50, 65, 0.12)" }
+            }
           }
         }
       });
@@ -966,10 +1435,24 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { position: "bottom" } },
+          plugins: {
+            legend: {
+              position: "bottom",
+              labels: { color: "#243241", font: { size: 12 } }
+            }
+          },
           scales: {
-            x: { title: { display: true, text: "生存ラウンド数（区間）" } },
-            y: { title: { display: true, text: "件数" }, beginAtZero: true }
+            x: {
+              title: { display: true, text: "生存ラウンド数（区間）", color: "#0f1b2d" },
+              ticks: { color: "#243241" },
+              grid: { color: "rgba(36, 50, 65, 0.12)" }
+            },
+            y: {
+              title: { display: true, text: "件数", color: "#0f1b2d" },
+              ticks: { color: "#243241" },
+              grid: { color: "rgba(36, 50, 65, 0.12)" },
+              beginAtZero: true
+            }
           }
         }
       });
@@ -1104,17 +1587,32 @@
       });
     }
 
-    function dominantLeaderPct(response, strategy) {
+    function dominantLeaderStats(response, strategy) {
       const rows = response.per_trial.filter((r) => r.strategy === strategy);
-      if (!rows.length) return 0;
-      const hits = rows.filter((r) => r.final_quadrant === "dominant_leader").length;
-      return (hits / rows.length) * 100;
+      const hitMap = new Map();
+      let hitCount = 0;
+      rows.forEach((row) => {
+        const hit = row.final_quadrant === "dominant_leader";
+        hitMap.set(row.seed, hit);
+        if (hit) hitCount += 1;
+      });
+      const n = rows.length;
+      return {
+        pct: n ? (hitCount / n) * 100 : 0,
+        n,
+        hitCount,
+        hitMap
+      };
     }
 
     function extractStrategyMetrics(response, strategy) {
       const agg = response.aggregates[strategy] || {};
+      const dominant = dominantLeaderStats(response, strategy);
       return {
-        dominant_leader_pct: dominantLeaderPct(response, strategy),
+        dominant_leader_pct: dominant.pct,
+        dominantHits: dominant.hitMap,
+        dominantHitsCount: dominant.hitCount,
+        dominantN: dominant.n,
         mean_net_profit: Number(agg.mean_net_profit ?? 0),
         bankruptcy_rate: Number(agg.bankruptcy_rate ?? 0) * 100,
         mean_survival_rounds: Number(agg.mean_survival_rounds ?? 0)
@@ -1132,13 +1630,19 @@
         reverseStage1ResultEl.innerHTML = "<p class=\"small\">実行対象のパラメータがありませんでした。</p>";
         return;
       }
+      const ciText = (ci) => `95%CI: ${ci.low.toFixed(1)}–${ci.high.toFixed(1)}%`;
       const tableRows = rows.map((row) => `
         <tr>
           <td>${REVERSE_PARAM_LABELS[row.parameter] || row.parameter}</td>
-          <td>${row.low.toFixed(1)}%</td>
-          <td>${row.base.toFixed(1)}%</td>
-          <td>${row.high.toFixed(1)}%</td>
+          <td title="${ciText(row.ciLow)}">${row.low.toFixed(1)}%</td>
+          <td title="${ciText(row.ciBase)}">${row.base.toFixed(1)}%</td>
+          <td title="${ciText(row.ciHigh)}">${row.high.toFixed(1)}%</td>
           <td>${row.direction}</td>
+          <td>
+            <span class="badge ${row.confidenceBadgeClass}" title="${row.confidenceDetail} (z低vs基準=${row.zLowBase.toFixed(2)}, z高vs基準=${row.zHighBase.toFixed(2)})">
+              ${row.confidenceLabel}
+            </span>
+          </td>
           <td>${row.maxAbsDeltaPt.toFixed(1)}pt</td>
           <td>${row.baseMeanNetProfit.toFixed(2)}</td>
         </tr>
@@ -1152,6 +1656,7 @@
               <th>基準(100%)の独走勝ち組型%</th>
               <th>高(125%)の独走勝ち組型%</th>
               <th>傾向</th>
+              <th>方向の信頼度</th>
               <th>最大変化幅(pt)</th>
               <th>参考: 基準の平均純利益</th>
             </tr>
@@ -1164,7 +1669,10 @@
           <strong>暫定値</strong>であり、この段階の数値だけを最終結論として採用しないでください。また、ここでの変化幅は
           基準値±25%という<strong>近い範囲だけを見た近似</strong>であり、そこから離れた値で挙動が急変する場合（例:
           エージェント人数投入の効き目(alpha)は基準値から離れた領域で急激に振る舞いが変わることが分かっています）
-          を検知できるとは限りません。
+          を検知できるとは限りません。<br />
+          「有意な方向性あり」「傾向はあるが不確実」「傾向不明瞭」は、各点の試行結果（最大80件）に基づく
+          対応のある比率差の検定（McNemar検定、有意水準5%、多重比較補正なし）による目安です。
+          「不確実」「不明瞭」は効果がないという意味ではなく、この試行数・この粗い探索条件では統計的に判別できないという意味です。
         </p>
       `;
     }
@@ -1174,14 +1682,28 @@
     }
 
     function renderReverseParamChoices(rows) {
-      const top4 = rows.slice(0, 4).map((row) => row.parameter);
-      const selected = new Set(rows.slice(0, 2).map((row) => row.parameter));
-      reverseParamSelectEl.innerHTML = top4.map((name) => `
+      const confidenceRank = (row) => {
+        if (row.confidenceTier === "significant") return 0;
+        if (row.confidenceTier === "uncertain") return 1;
+        return 2;
+      };
+      const ranked = [...rows].sort((a, b) => {
+        const rankDiff = confidenceRank(a) - confidenceRank(b);
+        return rankDiff !== 0 ? rankDiff : b.maxAbsDeltaPt - a.maxAbsDeltaPt;
+      });
+      const top4 = ranked.slice(0, 4).map((row) => row.parameter);
+      const selected = new Set(ranked.slice(0, 2).map((row) => row.parameter));
+      reverseParamSelectEl.innerHTML = `
+        <span class="small small-note reverse-confidence-help">
+          段階②の候補は、段階①テーブルの表示順（変化幅順）とは別に、方向の信頼度を優先して選んでいます。
+        </span>
+        ${top4.map((name) => `
         <label class="reverse-param-check">
           <input type="checkbox" class="reverse-param-toggle" value="${name}" ${selected.has(name) ? "checked" : ""} />
           <span>${REVERSE_PARAM_LABELS[name] || name}</span>
         </label>
-      `).join("");
+      `).join("")}
+      `;
       reverseParamSelectEl.querySelectorAll(".reverse-param-toggle").forEach((el) => {
         el.addEventListener("change", () => {
           const selectedNow = getSelectedReverseParams();
@@ -1370,7 +1892,12 @@
             reverseStage1StatusEl.textContent = `影響度ランキング実行中... (${completedCalls}/${REVERSE_STAGE1_CALLS})`;
             const result = await postSimulate(payload);
             const metrics = extractStrategyMetrics(result, targetStrategy);
-            dominantPoints.push(metrics.dominant_leader_pct);
+            dominantPoints.push({
+              pct: metrics.dominant_leader_pct,
+              hits: metrics.dominantHits,
+              hitsCount: metrics.dominantHitsCount,
+              n: metrics.dominantN
+            });
             netProfitPoints.push(metrics.mean_net_profit);
           }
           const summary = summarizeQuadrantSweep(
