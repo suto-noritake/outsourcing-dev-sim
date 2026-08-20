@@ -6,31 +6,95 @@
   <title>ABMインタラクティブダッシュボード</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <style>
-    body { font-family: Arial, sans-serif; margin: 16px; color: #111827; }
-    h1, h2 { margin: 0 0 12px; }
-    .panel { border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; margin-bottom: 14px; background: #fafafa; }
+    :root {
+      --color-bg: #f8fafc;
+      --color-panel: #ffffff;
+      --color-border: #e2e8f0;
+      --color-text: #334155;
+      --color-heading: #0f172a;
+      --color-muted: #64748b;
+      --color-accent: #2563eb;
+      --color-accent-hover: #1d4ed8;
+      --shadow-panel: 0 1px 2px rgba(15, 23, 42, 0.06), 0 4px 10px rgba(15, 23, 42, 0.05);
+      --radius-panel: 12px;
+      --radius-card: 10px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Yu Gothic UI", Meiryo, Roboto, "Noto Sans JP", sans-serif;
+      margin: 0;
+      padding: 24px;
+      background: var(--color-bg);
+      color: var(--color-text);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    h1 { font-size: 24px; font-weight: 700; color: var(--color-heading); margin: 0 0 16px; }
+    h2 {
+      font-size: 17px; font-weight: 700; color: var(--color-heading);
+      margin: 0 0 12px; padding-left: 10px; border-left: 4px solid var(--color-accent);
+    }
+    h3 { font-size: 15px; font-weight: 700; color: var(--color-heading); margin: 0 0 4px; }
+
+    .panel {
+      border: 1px solid var(--color-border); border-radius: var(--radius-panel);
+      padding: 16px; margin-bottom: 16px; background: var(--color-panel);
+      box-shadow: var(--shadow-panel);
+    }
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; }
     label { display: flex; flex-direction: column; font-size: 12px; gap: 4px; }
-    .field-label { font-weight: 600; }
-    .field-label small { font-weight: 400; color: #6b7280; }
-    input, select, button { padding: 6px; font-size: 13px; }
-    .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    .field-label { font-weight: 600; color: var(--color-heading); }
+    .field-label small { font-weight: 400; color: var(--color-muted); }
+    input, select { padding: 6px; font-size: 13px; border: 1px solid #cbd5e1; border-radius: 6px; color: var(--color-text); }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; align-items: center; }
     .summary-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
-    .strategy-card { border: 1px solid #d1d5db; border-radius: 8px; padding: 10px; background: #fff; }
-    .metric-item { margin-top: 8px; border-top: 1px dashed #e5e7eb; padding-top: 8px; }
-    .metric-label { font-size: 13px; font-weight: 600; }
-    .metric-label small { font-weight: 400; color: #6b7280; }
-    .metric-value { font-size: 18px; margin-top: 2px; }
-    .metric-help { font-size: 12px; color: #4b5563; margin-top: 2px; line-height: 1.45; }
+    .strategy-card {
+      border: 1px solid var(--color-border); border-radius: var(--radius-card);
+      padding: 12px; background: #fff; box-shadow: var(--shadow-panel);
+    }
+    .metric-item { margin-top: 8px; border-top: 1px dashed var(--color-border); padding-top: 8px; }
+    .metric-label { font-weight: 600; font-size: 12.5px; color: var(--color-heading); }
+    .metric-label small { font-weight: 400; color: var(--color-muted); }
+    .metric-value { font-size: 22px; font-weight: 700; color: var(--color-heading); margin-top: 2px; }
+    .metric-help { font-size: 12px; color: var(--color-muted); margin-top: 2px; line-height: 1.45; }
+
+    button {
+      border-radius: 8px; border: 1px solid transparent; cursor: pointer;
+      font-weight: 600; padding: 8px 14px; font-size: 13px;
+    }
+    #run-btn, #compare-btn, #sensitivity-run-btn { background: var(--color-accent); color: #fff; }
+    #run-btn:hover, #compare-btn:hover, #sensitivity-run-btn:hover { background: var(--color-accent-hover); }
+    #baseline-btn { background: #fff; border-color: #cbd5e1; color: var(--color-text); }
+    #baseline-btn:hover { background: #f1f5f9; }
+
     .error { color: #b91c1c; white-space: pre-wrap; margin-top: 8px; }
-    .small { font-size: 12px; color: #6b7280; line-height: 1.5; }
+    .small { font-size: 12px; color: var(--color-muted); line-height: 1.5; }
     .chart-container { position: relative; height: 400px; width: 100%; }
     .chart-container canvas { max-height: none; }
     .axis-help { margin: 10px 0 8px; padding: 8px; border-radius: 6px; background: #eef2ff; font-size: 12px; line-height: 1.5; }
     .quadrant-legend { margin-top: 8px; display: grid; gap: 6px; }
-    .quadrant-item { border: 1px solid #e5e7eb; border-radius: 6px; background: #fff; padding: 8px; font-size: 12px; line-height: 1.45; }
+    .quadrant-item { border: 1px solid var(--color-border); border-radius: 6px; background: #fff; padding: 8px; font-size: 12px; line-height: 1.45; }
     .quadrant-title { font-weight: 700; display: flex; align-items: center; gap: 6px; }
     .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 999px; }
+    .shape-legend-note { font-size: 12px; color: var(--color-muted); margin-bottom: 4px; }
+
+    .quadrant-dist-title { font-size: 12.5px; font-weight: 600; color: var(--color-heading); margin-top: 10px; }
+    .quadrant-dist-row {
+      display: grid; grid-template-columns: 12px 108px 1fr 44px; align-items: center;
+      gap: 6px; margin-top: 4px; font-size: 12px;
+    }
+    .quadrant-dist-bar-track { background: #f1f5f9; border-radius: 999px; height: 8px; overflow: hidden; }
+    .quadrant-dist-bar-fill { height: 100%; border-radius: 999px; }
+    .tendency-text {
+      font-size: 12.5px; color: var(--color-text); margin-top: 10px;
+      padding-top: 8px; border-top: 1px dashed var(--color-border); line-height: 1.5;
+    }
+
+    .sensitivity-panel .intro { font-size: 12.5px; color: var(--color-muted); line-height: 1.6; margin-bottom: 8px; }
+    .sensitivity-table { border-collapse: collapse; width: 100%; font-size: 12.5px; margin-top: 8px; }
+    .sensitivity-table th, .sensitivity-table td { border: 1px solid var(--color-border); padding: 6px 8px; text-align: right; }
+    .sensitivity-table th:first-child, .sensitivity-table td:first-child { text-align: left; }
+
     @media (max-width: 480px) {
       .chart-container { height: 280px; }
     }
@@ -139,6 +203,20 @@
     <div id="summary" class="summary-grid"></div>
   </div>
 
+  <div class="panel sensitivity-panel">
+    <h2>パラメータ感度チェック（探索的・簡易版）</h2>
+    <p class="intro">
+      選択中の戦略について、指定パラメータを基準値の75%・100%・125%に変えた3パターンを、同じ試行回数・同じ乱数の開始番号で実行し、平均純利益がどちらの方向にどれくらい振れるかを比較する簡易的なチェックです。3パターンだけの比較のため、相関係数などの統計的検定は行っていません（3点しかない場合は見かけ上ほぼ必ずきれいな相関になってしまい、かえって誤った精密さの印象を与えるため、あえて採用していません）。あくまで大まかな傾向をつかむための参考情報としてご利用ください。
+    </p>
+    <div class="actions">
+      <button type="button" id="sensitivity-run-btn">感度チェックを実行</button>
+      <span id="sensitivity-estimate" class="small"></span>
+    </div>
+    <div id="sensitivity-estimate-note" class="small"></div>
+    <div id="sensitivity-status" class="small"></div>
+    <div id="sensitivity-result"></div>
+  </div>
+
   <div class="panel">
     <h2>四象限散布図（技術優位度 vs 資金体力）</h2>
     <div class="chart-container">
@@ -224,13 +302,52 @@
       cost_optimal: "#14b8a6",
       adaptive: "#f97316"
     };
+    const strategyPointStyle = {
+      conservative: "circle",
+      cost_optimal: "triangle",
+      adaptive: "rect"
+    };
+
+    const quadrantThresholdPlugin = {
+      id: "quadrantThresholds",
+      afterDatasetsDraw(chart) {
+        const { ctx, chartArea, scales } = chart;
+        if (!chartArea) return;
+        const xPix = scales.x.getPixelForValue(0);
+        const yPix = scales.y.getPixelForValue(5);
+        ctx.save();
+        ctx.strokeStyle = "rgba(100, 116, 139, 0.6)";
+        ctx.setLineDash([4, 4]);
+        ctx.lineWidth = 1;
+        if (xPix >= chartArea.left && xPix <= chartArea.right) {
+          ctx.beginPath();
+          ctx.moveTo(xPix, chartArea.top);
+          ctx.lineTo(xPix, chartArea.bottom);
+          ctx.stroke();
+        }
+        if (yPix >= chartArea.top && yPix <= chartArea.bottom) {
+          ctx.beginPath();
+          ctx.moveTo(chartArea.left, yPix);
+          ctx.lineTo(chartArea.right, yPix);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+    };
 
     const form = document.getElementById("sim-form");
     const summaryEl = document.getElementById("summary");
     const errorEl = document.getElementById("error");
     const quadrantLegendEl = document.getElementById("quadrant-legend");
+    const sensitivityEstimateEl = document.getElementById("sensitivity-estimate");
+    const sensitivityEstimateNoteEl = document.getElementById("sensitivity-estimate-note");
+    const sensitivityStatusEl = document.getElementById("sensitivity-status");
+    const sensitivityResultEl = document.getElementById("sensitivity-result");
+    const sensitivityRunBtn = document.getElementById("sensitivity-run-btn");
     let scatterChart = null;
     let histChart = null;
+    let latestMainResponse = null;
+    let sensitivityRunning = false;
 
     function formatStrategy(strategy) {
       return `${STRATEGY_LABEL_JA[strategy] || strategy} (${strategy})`;
@@ -240,11 +357,20 @@
       return `${QUADRANT_LABEL_JA[quadrant] || quadrant} (${quadrant})`;
     }
 
+    function withAlpha(hex, alpha) {
+      const h = String(hex || "").replace("#", "");
+      const r = parseInt(h.substring(0, 2), 16);
+      const g = parseInt(h.substring(2, 4), 16);
+      const b = parseInt(h.substring(4, 6), 16);
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
     function setDefaults() {
       for (const [key, value] of Object.entries(defaults)) {
         const el = form.elements[key];
         if (el) el.value = value;
       }
+      updateSensitivityEstimate();
     }
 
     function numberValue(name, asInt = false) {
@@ -280,10 +406,56 @@
     }
 
     function formatMetricValue(metricKey, value) {
-      if (metricKey === "mean_survival_rounds" || metricKey === "mean_net_profit") {
-        return Number(value).toFixed(2);
-      }
+      if (metricKey === "mean_survival_rounds" || metricKey === "mean_net_profit") return Number(value).toFixed(2);
       return Number(value).toFixed(4);
+    }
+
+    function quadrantDistribution(strategy, perTrial) {
+      const rows = perTrial.filter((r) => r.strategy === strategy);
+      const total = rows.length;
+      const counts = {};
+      Object.keys(QUADRANT_LABEL_JA).forEach((q) => { counts[q] = 0; });
+      rows.forEach((r) => { counts[r.final_quadrant] = (counts[r.final_quadrant] || 0) + 1; });
+      return Object.keys(QUADRANT_LABEL_JA).map((q) => ({
+        quadrant: q,
+        count: counts[q],
+        pct: total ? (counts[q] / total) * 100 : 0
+      }));
+    }
+
+    function tendencyCommentary(strategy, distRows, aggregate) {
+      const top = distRows.reduce((a, b) => (b.pct > a.pct ? b : a));
+      const bkr = aggregate.bankruptcy_rate;
+      const label = formatStrategy(strategy);
+
+      if (top.pct < 30) {
+        return `${label}は特定の型に偏らず、試行ごとに結果の型が大きく分かれています` +
+          `（最多でも${top.pct.toFixed(0)}%）。設定条件に対して結果が安定しにくい戦略と言えます。`;
+      }
+      const base = {
+        dominant_leader: `${label}は試行の${top.pct.toFixed(0)}%が①独走勝ち組型に到達しており、` +
+          `技術・資金の両面で優位に立てる傾向が強い設定です。`,
+        cash_starved_specialist: `${label}は試行の${top.pct.toFixed(0)}%が②宝の持ち腐れ／燃え尽き型です。` +
+          `技術力は足りているのに資金体力が続かない傾向があり、資金繰り面（部分払い・予算係数等）の` +
+          `見直し余地があります。`,
+        deep_pockets_shallow_skills: `${label}は試行の${top.pct.toFixed(0)}%が③物量型／時間稼ぎ型です。` +
+          `資金体力で延命はできていますが、技術力が難易度に追いついていない傾向があります。`,
+        exit_candidate: `${label}は試行の${top.pct.toFixed(0)}%が④淘汰予備軍型です。` +
+          `技術・資金とも劣勢になりやすく、倒産割合も${(bkr * 100).toFixed(1)}%と${bkr > 0.3 ? "高水準" : "一定水準"}です。`
+      };
+      return base[top.quadrant];
+    }
+
+    function summarizeSweep(low, base, high) {
+      const denom = Math.abs(base) > 1e-9 ? Math.abs(base) : 1e-9;
+      const deltaLowPct = ((low - base) / denom) * 100;
+      const deltaHighPct = ((high - base) / denom) * 100;
+      const maxAbsDeltaPct = Math.max(Math.abs(deltaLowPct), Math.abs(deltaHighPct));
+      let direction;
+      if (high > base && base > low) direction = "増加方向（値を上げると平均純利益が増える傾向）";
+      else if (high < base && base < low) direction = "減少方向（値を上げると平均純利益が減る傾向）";
+      else direction = "方向が一定しない（試行回数が少なく、乱数ノイズの影響が大きい可能性）";
+      return { low, base, high, deltaLowPct, deltaHighPct, maxAbsDeltaPct, direction };
     }
 
     function showSummary(response) {
@@ -303,16 +475,43 @@
           `)
           .join("");
 
+        const rowsByStrategy = response.per_trial.filter((r) => r.strategy === strategy);
+        const distRows = quadrantDistribution(strategy, response.per_trial).sort((a, b) => b.pct - a.pct);
+        const distRowsHtml = distRows
+          .map((row) => `
+            <div class="quadrant-dist-row">
+              <span class="swatch" style="background:${quadrantColors[row.quadrant] || "#6b7280"}"></span>
+              <span class="quadrant-dist-label">${QUADRANT_LABEL_JA[row.quadrant] || row.quadrant}</span>
+              <div class="quadrant-dist-bar-track">
+                <div class="quadrant-dist-bar-fill" style="width:${row.pct.toFixed(1)}%; background:${quadrantColors[row.quadrant] || "#6b7280"};"></div>
+              </div>
+              <span class="quadrant-dist-pct">${row.pct.toFixed(1)}%</span>
+            </div>
+          `)
+          .join("");
+        const tendency = tendencyCommentary(strategy, distRows, stats);
+
         card.innerHTML = `
           <h3>${formatStrategy(strategy)}</h3>
           ${metricRows}
+          <div class="quadrant-dist">
+            <div class="quadrant-dist-title">四象限分布（試行N=<span>${rowsByStrategy.length}</span>）</div>
+            ${distRowsHtml}
+          </div>
+          <p class="tendency-text">${tendency}</p>
         `;
         summaryEl.appendChild(card);
       });
     }
 
-    function renderQuadrantLegend() {
+    function renderQuadrantLegend(compareStrategies = false) {
       quadrantLegendEl.innerHTML = "";
+      if (compareStrategies) {
+        const note = document.createElement("div");
+        note.className = "shape-legend-note";
+        note.textContent = "形状（比較モード時のみ）: ● 保守的　▲ コスト最適　■ 適応型　※色は四象限のみを表します";
+        quadrantLegendEl.appendChild(note);
+      }
       Object.keys(QUADRANT_LABEL_JA).forEach((quadrant) => {
         const detail = QUADRANT_DETAILS[quadrant];
         const item = document.createElement("div");
@@ -339,26 +538,29 @@
         .map((strategy) => ({
           label: formatStrategy(strategy),
           data: grouped[strategy].map((p) => ({
-            x: p.x,
-            y: p.y,
-            quadrant: p.quadrant,
-            seed: p.seed,
-            strategy: p.strategy
+            x: p.x, y: p.y, quadrant: p.quadrant, seed: p.seed, strategy: p.strategy
           })),
-          backgroundColor: strategyColors[strategy] || "#6b7280",
-          pointBackgroundColor: grouped[strategy].map((p) => quadrantColors[p.quadrant] || "#6b7280"),
-          pointRadius: 4
+          pointStyle: strategyPointStyle[strategy] || "circle",
+          pointBackgroundColor: grouped[strategy].map(
+            (p) => withAlpha(quadrantColors[p.quadrant] || "#6b7280", 0.55)
+          ),
+          pointBorderColor: "rgba(30, 41, 59, 0.55)",
+          pointBorderWidth: 1.25,
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          pointHoverBorderWidth: 2
         }));
 
       if (scatterChart) scatterChart.destroy();
       scatterChart = new Chart(document.getElementById("scatter-chart"), {
         type: "scatter",
         data: { datasets },
+        plugins: [quadrantThresholdPlugin],
         options: {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { position: "bottom" },
+            legend: { display: false },
             tooltip: {
               callbacks: {
                 label: (context) => {
@@ -375,25 +577,22 @@
             }
           },
           scales: {
-            x: { title: { display: true, text: "技術優位度" } },
-            y: { title: { display: true, text: "資金体力" } }
+            x: { title: { display: true, text: "技術優位度 (capability_margin)" } },
+            y: { title: { display: true, text: "資金体力 (funding_runway)" } }
           }
         }
       });
+
+      renderQuadrantLegend(response.meta.compare_strategies);
     }
 
     function buildHistogram(values, bins) {
       const min = Math.min(...values);
       const max = Math.max(...values);
-      if (min === max) {
-        return { labels: [String(min)], edges: [min, min + 1] };
-      }
+      if (min === max) return { labels: [String(min)], edges: [min, min + 1] };
       const width = (max - min) / bins;
       const edges = Array.from({ length: bins + 1 }, (_, i) => min + i * width);
-      const labels = Array.from(
-        { length: bins },
-        (_, i) => `${edges[i].toFixed(0)}-${edges[i + 1].toFixed(0)}`
-      );
+      const labels = Array.from({ length: bins }, (_, i) => `${edges[i].toFixed(0)}-${edges[i + 1].toFixed(0)}`);
       return { labels, edges };
     }
 
@@ -446,25 +645,151 @@
       });
     }
 
+    function updateSensitivityEstimate() {
+      const targetStrategy = form.elements["strategy"].value;
+      const targetStrategyJa = STRATEGY_LABEL_JA[targetStrategy] || targetStrategy;
+      const sweepNTrials = Math.min(150, Math.max(1, numberValue("n_trials", true) || 1));
+      let estSeconds = null;
+      if (latestMainResponse && latestMainResponse.meta && latestMainResponse.meta.n_trials > 0) {
+        estSeconds = latestMainResponse.meta.elapsed_seconds * (sweepNTrials / latestMainResponse.meta.n_trials) * 6;
+      }
+      const secText = estSeconds === null ? "-" : Math.max(estSeconds, 0).toFixed(1);
+      sensitivityEstimateEl.textContent = `概算所要時間: 約${secText}秒（追加で最大6回のシミュレーションを実行します。対象戦略: ${targetStrategyJa}）`;
+      sensitivityEstimateNoteEl.textContent = estSeconds !== null && estSeconds > 10
+        ? "メイン実行の試行回数を減らすと感度チェックが速くなります。"
+        : "";
+    }
+
+    async function postSimulate(payload) {
+      const res = await fetch("/api/simulate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const body = await res.json();
+      if (!res.ok) {
+        const message = JSON.stringify(body.detail ?? body, null, 2);
+        throw new Error(message);
+      }
+      return body;
+    }
+
     async function runSimulation(compareStrategies) {
       errorEl.textContent = "";
       const payload = buildPayload(compareStrategies);
       try {
-        const res = await fetch("/api/simulate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-        const body = await res.json();
-        if (!res.ok) {
-          errorEl.textContent = JSON.stringify(body.detail ?? body, null, 2);
-          return;
-        }
+        const body = await postSimulate(payload);
+        latestMainResponse = body;
         showSummary(body);
         drawScatter(body);
         drawHistogram(body);
+        updateSensitivityEstimate();
       } catch (err) {
         errorEl.textContent = `リクエストに失敗しました: ${err}`;
+      }
+    }
+
+    async function runSensitivitySweep() {
+      if (sensitivityRunning) return;
+      sensitivityRunning = true;
+      sensitivityRunBtn.disabled = true;
+      sensitivityStatusEl.textContent = "";
+      sensitivityResultEl.innerHTML = "";
+      errorEl.textContent = "";
+
+      const basePayload = buildPayload(false);
+      const targetStrategy = basePayload.params.strategy;
+      const sweepNTrials = Math.min(150, Math.max(1, basePayload.n_trials));
+      const baseSeed = basePayload.base_seed;
+      const paramsToSweep = ["k1", "sigma_noise"];
+      const rows = [];
+      const notes = [];
+      let completedCalls = 0;
+
+      try {
+        for (const paramName of paramsToSweep) {
+          const baseValue = Number(basePayload.params[paramName]);
+          if (baseValue === 0) {
+            notes.push(`${paramName}: 基準値が0のため感度チェックをスキップしました。`);
+            continue;
+          }
+
+          const factorValues = [0.75, 1.0, 1.25].map((factor) => baseValue * factor);
+          if (paramName === "sigma_noise") {
+            factorValues[2] = Math.min(2.0, factorValues[2]);
+          }
+
+          const meanNetProfitByPoint = [];
+          for (let i = 0; i < factorValues.length; i++) {
+            const payload = {
+              params: {
+                ...basePayload.params,
+                [paramName]: factorValues[i]
+              },
+              n_trials: sweepNTrials,
+              base_seed: baseSeed,
+              compare_strategies: false
+            };
+            completedCalls += 1;
+            sensitivityStatusEl.textContent = `感度チェック実行中... (${completedCalls}/6)`;
+            const result = await postSimulate(payload);
+            meanNetProfitByPoint.push(Number(result.aggregates[targetStrategy].mean_net_profit));
+          }
+
+          if (paramName === "sigma_noise" && baseValue * 1.25 > 2.0) {
+            notes.push("sigma_noise: +25% 点が上限2.0を超えるため 2.0 にクランプしました。");
+          }
+
+          const summary = summarizeSweep(
+            meanNetProfitByPoint[0],
+            meanNetProfitByPoint[1],
+            meanNetProfitByPoint[2]
+          );
+          rows.push({
+            parameter: paramName,
+            ...summary
+          });
+        }
+
+        if (!rows.length) {
+          sensitivityResultEl.innerHTML = "<p class=\"small\">実行対象のパラメータがありませんでした。</p>";
+        } else {
+          const tableRows = rows.map((row) => `
+            <tr>
+              <td>${row.parameter}</td>
+              <td>${row.low.toFixed(2)}</td>
+              <td>${row.base.toFixed(2)}</td>
+              <td>${row.high.toFixed(2)}</td>
+              <td>${row.direction}</td>
+              <td>${row.maxAbsDeltaPct.toFixed(1)}%</td>
+            </tr>
+          `).join("");
+          sensitivityResultEl.innerHTML = `
+            <table class="sensitivity-table">
+              <thead>
+                <tr>
+                  <th>パラメータ</th>
+                  <th>低(-25%)の平均純利益</th>
+                  <th>基準の平均純利益</th>
+                  <th>高(+25%)の平均純利益</th>
+                  <th>傾向</th>
+                  <th>最大変化幅(%)</th>
+                </tr>
+              </thead>
+              <tbody>${tableRows}</tbody>
+            </table>
+          `;
+        }
+
+        sensitivityStatusEl.textContent = notes.length
+          ? `感度チェック完了（${completedCalls}回実行）。${notes.join(" ")}`
+          : `感度チェック完了（${completedCalls}回実行）。`;
+      } catch (err) {
+        sensitivityStatusEl.textContent = "";
+        errorEl.textContent = `感度チェックに失敗しました: ${err}`;
+      } finally {
+        sensitivityRunning = false;
+        sensitivityRunBtn.disabled = false;
       }
     }
 
@@ -475,9 +800,12 @@
     });
     document.getElementById("run-btn").addEventListener("click", () => runSimulation(false));
     document.getElementById("compare-btn").addEventListener("click", () => runSimulation(true));
+    document.getElementById("sensitivity-run-btn").addEventListener("click", () => runSensitivitySweep());
+    form.elements["strategy"].addEventListener("change", updateSensitivityEstimate);
+    form.elements["n_trials"].addEventListener("input", updateSensitivityEstimate);
 
     setDefaults();
-    renderQuadrantLegend();
+    renderQuadrantLegend(false);
   </script>
 </body>
 </html>
