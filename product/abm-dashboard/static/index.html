@@ -45,8 +45,23 @@
     label { display: flex; flex-direction: column; font-size: 12px; gap: 4px; }
     .field-label { font-weight: 600; color: var(--color-heading); }
     .field-label small { font-weight: 400; color: var(--color-muted); }
+    .field-input-pair { display: grid; gap: 4px; }
+    input[type="range"] { padding: 0; accent-color: var(--color-accent); }
     input, select { padding: 6px; font-size: 13px; border: 1px solid #cbd5e1; border-radius: 6px; color: var(--color-text); }
     .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; align-items: center; }
+    .title-with-badge { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .run-mode-badge {
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 999px;
+      padding: 2px 8px;
+      border: 1px solid transparent;
+      min-height: 20px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .run-mode-badge.is-preview { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
+    .run-mode-badge.is-precise { background: #1d4ed8; color: #fff; border-color: #1d4ed8; }
     .summary-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
     .strategy-card {
       border: 1px solid var(--color-border); border-radius: var(--radius-card);
@@ -62,8 +77,13 @@
       border-radius: 8px; border: 1px solid transparent; cursor: pointer;
       font-weight: 600; padding: 8px 14px; font-size: 13px;
     }
-    #run-btn, #compare-btn, #sensitivity-run-btn { background: var(--color-accent); color: #fff; }
-    #run-btn:hover, #compare-btn:hover, #sensitivity-run-btn:hover { background: var(--color-accent-hover); }
+    #run-btn, #compare-btn, #sensitivity-run-btn, #reverse-stage1-run-btn, #reverse-stage2-run-btn {
+      background: var(--color-accent);
+      color: #fff;
+    }
+    #run-btn:hover, #compare-btn:hover, #sensitivity-run-btn:hover, #reverse-stage1-run-btn:hover, #reverse-stage2-run-btn:hover {
+      background: var(--color-accent-hover);
+    }
     #baseline-btn { background: #fff; border-color: #cbd5e1; color: var(--color-text); }
     #baseline-btn:hover { background: #f1f5f9; }
 
@@ -94,6 +114,16 @@
     .sensitivity-table { border-collapse: collapse; width: 100%; font-size: 12.5px; margin-top: 8px; }
     .sensitivity-table th, .sensitivity-table td { border: 1px solid var(--color-border); padding: 6px 8px; text-align: right; }
     .sensitivity-table th:first-child, .sensitivity-table td:first-child { text-align: left; }
+    .reverse-calc-card { border: 1px solid var(--color-border); border-radius: var(--radius-card); padding: 12px; margin-top: 10px; }
+    .reverse-calc-card h3 { margin-bottom: 8px; }
+    .reverse-calc-disabled { opacity: 0.6; }
+    .reverse-params { display: flex; flex-wrap: wrap; gap: 10px; margin: 8px 0; }
+    .reverse-param-check { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; }
+    .reverse-reco-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 8px; margin-top: 8px; }
+    .reverse-reco-card { border: 1px solid var(--color-border); border-radius: 8px; padding: 10px; background: #fff; }
+    .reverse-reco-card ul { margin: 6px 0 8px 16px; padding: 0; }
+    .reverse-reco-card li { margin: 2px 0; }
+    .reverse-disclaimer { margin-top: 8px; }
 
     @media (max-width: 480px) {
       .chart-container { height: 280px; }
@@ -109,67 +139,115 @@
       <div class="grid">
         <label title="同じ案件に投入する人数を増やしたとき、技術力がどれだけ伸びるかを左右します。値が1に近いほど人数を増やした分だけ素直に技術力が伸び、0に近いほど人数を増やしても頭打ちになりやすくなります（3人目・4人目の追加効果が薄い）。">
           <span class="field-label">エージェント人数投入の効き目 <small>(alpha)</small></span>
-          <input type="number" step="0.01" name="alpha" />
+          <div class="field-input-pair">
+            <input type="number" min="0.01" max="2.0" step="0.01" name="alpha" />
+            <input type="range" min="0.01" max="2.0" step="0.01" name="alpha__range" />
+          </div>
         </label>
         <label title="技術力が案件の難易度を上回っているかどうかで、成功・失敗がどれくらいハッキリ決まるかを表します。値が大きいほど「技術力が難易度を上回っていればほぼ確実に成功、下回っていればほぼ確実に失敗」という結果になり、僅差の逆転が起きにくくなります。値を上げても成功率そのものが下がるわけではありません。">
           <span class="field-label">成功・失敗の白黒のつきやすさ <small>(beta)</small></span>
-          <input type="number" step="0.01" name="beta" />
+          <div class="field-input-pair">
+            <input type="number" min="0.01" max="20.0" step="0.1" name="beta" />
+            <input type="range" min="0.01" max="20.0" step="0.1" name="beta__range" />
+          </div>
         </label>
         <label title="クライアントがB社に持つ信頼度を、直近の成功/失敗とこれまでの実績のどちらを重視して更新するかを表します。値が大きいほど信頼度はゆっくりとしか動かず（1回の失敗で急落しない代わり挽回にも時間がかかる）、値が小さいほど直近の結果に敏感に上下します。">
           <span class="field-label">信頼度（評判）の変わりやすさ <small>(lam)</small></span>
-          <input type="number" step="0.01" name="lam" />
+          <div class="field-input-pair">
+            <input type="number" min="0.0" max="1.0" step="0.01" name="lam" />
+            <input type="range" min="0.0" max="1.0" step="0.01" name="lam__range" />
+          </div>
         </label>
         <label title="案件をこなすたびにかかる費用全体の水準を決める基礎係数です。技術力には影響せず、純粋に「同じ仕事にいくらかかるか」だけを底上げします。値が大きいほど同じ案件でもコストが高くつき、資金の減りが早くなります。">
           <span class="field-label">コストの基準倍率 <small>(k1)</small></span>
-          <input type="number" step="0.01" name="k1" />
+          <div class="field-input-pair">
+            <input type="number" min="0.01" max="10.0" step="0.01" name="k1" />
+            <input type="range" min="0.01" max="10.0" step="0.01" name="k1__range" />
+          </div>
         </label>
         <label title="より高性能なモデル（Low→Mid→High→Frontier）を使うほど、コストがどれだけ急激に高くなるかを表す指数です。値が大きいほど「高性能ほど性能の伸び以上にコストが跳ね上がる」傾向が強まり、値が小さいほど高性能モデルでも比較的割安に使えます。">
           <span class="field-label">高性能モデルの割高さ <small>(cost_curve_exponent)</small></span>
-          <input type="number" step="0.01" name="cost_curve_exponent" />
+          <div class="field-input-pair">
+            <input type="number" min="0.5" max="5.0" step="0.1" name="cost_curve_exponent" />
+            <input type="range" min="0.5" max="5.0" step="0.1" name="cost_curve_exponent__range" />
+          </div>
         </label>
         <label title="毎ラウンドのコストや所要時間について、見積もりからどれだけ実績がブレるかを表します。値が大きいほど、同じ条件でも実際の費用・時間が予想より大きく上下しやすくなります。成功・失敗の判定そのものには影響しません。">
           <span class="field-label">コスト・工数の見積もりのブレ <small>(sigma_noise)</small></span>
-          <input type="number" step="0.01" name="sigma_noise" />
+          <div class="field-input-pair">
+            <input type="number" min="0.0" max="2.0" step="0.01" name="sigma_noise" />
+            <input type="range" min="0.0" max="2.0" step="0.01" name="sigma_noise__range" />
+          </div>
         </label>
         <label title="B社が案件に成功するたびに、クライアントが「次はもっと難しい仕事を」と要求難易度をどれだけ引き上げてくるかを表します。値が大きいほど成功のたびに難易度が急激に上がり、やがて技術力が追いつかなくなるリスクが高まります。B社自身の成長速度ではなく、クライアント側の「欲張り度」を表す値です。">
           <span class="field-label">クライアントの要求エスカレーション率 <small>(gamma)</small></span>
-          <input type="number" step="0.01" name="gamma" />
+          <div class="field-input-pair">
+            <input type="number" min="0.0" max="2.0" step="0.01" name="gamma" />
+            <input type="range" min="0.0" max="2.0" step="0.01" name="gamma__range" />
+          </div>
         </label>
         <label title="案件が失敗に終わった場合に限り、クライアントが契約予算の何割かを支払ってくれるかを表す割合（0〜1）です。0なら失敗した回の支払いは一切なく、1に近いほど失敗しても収入があるため資金への打撃が和らぎます。">
           <span class="field-label">失敗時の補填払い率 <small>(partial_pay)</small></span>
-          <input type="number" step="0.01" name="partial_pay" />
+          <div class="field-input-pair">
+            <input type="number" min="0.0" max="1.0" step="0.01" name="partial_pay" />
+            <input type="range" min="0.0" max="1.0" step="0.01" name="partial_pay__range" />
+          </div>
         </label>
         <label title="クライアントが持つB社への信頼度（0〜1）がこの値を下回ると、クライアントは即座に契約を打ち切ります。値が大きいほど少しの信頼低下でも契約解除されやすく（基準が厳しい）、値が小さいほど信頼が多少下がっても契約が続きやすくなります（基準が緩い）。支払われる報酬額とは無関係です。">
           <span class="field-label">契約打ち切りの信頼度ライン <small>(r_min)</small></span>
-          <input type="number" step="0.01" name="r_min" />
+          <div class="field-input-pair">
+            <input type="number" min="0.0" max="1.0" step="0.01" name="r_min" />
+            <input type="range" min="0.0" max="1.0" step="0.01" name="r_min__range" />
+          </div>
         </label>
         <label title="案件に何回連続で失敗すると、クライアントが見切りをつけて契約を打ち切るかを表す回数です。値が大きいほど連続失敗にも猶予がありますが、値が小さいと少しのつまずきですぐ契約解除につながります。">
           <span class="field-label">連続失敗の我慢の限度 <small>(max_consecutive_failures)</small></span>
-          <input type="number" step="1" name="max_consecutive_failures" />
+          <div class="field-input-pair">
+            <input type="number" min="1" max="50" step="1" name="max_consecutive_failures" />
+            <input type="range" min="1" max="50" step="1" name="max_consecutive_failures__range" />
+          </div>
         </label>
         <label title="シミュレーション開始時点で発注される案件の難易度です。序盤の技術力とのバランスが、最初の成功しやすさを左右します。">
           <span class="field-label">開始時点の案件の難易度 <small>(difficulty_0)</small></span>
-          <input type="number" step="0.01" name="difficulty_0" />
+          <div class="field-input-pair">
+            <input type="number" min="0.01" max="20.0" step="0.01" name="difficulty_0" />
+            <input type="range" min="0.01" max="20.0" step="0.01" name="difficulty_0__range" />
+          </div>
         </label>
         <label title="B社が事業を始める時点で持っている運転資金です（目安：中規模案件およそ10件分に相当）。この資金がなくなると倒産としてシミュレーションが終了します。">
           <span class="field-label">開始時点の手持ち資金 <small>(funds_0)</small></span>
-          <input type="number" step="0.01" name="funds_0" />
+          <div class="field-input-pair">
+            <input type="number" min="1.0" max="2000.0" step="1.0" name="funds_0" />
+            <input type="range" min="1.0" max="2000.0" step="1.0" name="funds_0__range" />
+          </div>
         </label>
         <label title="クライアントの要求エスカレーション（gamma）によって難易度が際限なく上がり続けないよう設ける上限値です。難易度はこの値を超えて上がりません。">
           <span class="field-label">難易度の上限 <small>(difficulty_cap)</small></span>
-          <input type="number" step="0.01" name="difficulty_cap" />
+          <div class="field-input-pair">
+            <input type="number" min="1.0" max="100.0" step="0.1" name="difficulty_cap" />
+            <input type="range" min="1.0" max="100.0" step="0.1" name="difficulty_cap__range" />
+          </div>
         </label>
         <label title="クライアントがB社に支払う契約予算（報酬）のうち、案件の難易度に関係なく常に上乗せされる固定部分の金額です。値が大きいほど、簡単な案件でも一定額の報酬が保証されます。">
           <span class="field-label">契約予算の基本額 <small>(budget_c0)</small></span>
-          <input type="number" step="0.01" name="budget_c0" />
+          <div class="field-input-pair">
+            <input type="number" min="0.0" max="100.0" step="0.5" name="budget_c0" />
+            <input type="range" min="0.0" max="100.0" step="0.5" name="budget_c0__range" />
+          </div>
         </label>
         <label title="契約予算（報酬）のうち、案件の難易度とB社の評判に応じて増減する部分の大きさを決める係数です。値が大きいほど、難しい案件・評判が良い状態であるほど報酬が大きく積み増されます（評判が低いと上乗せ分は最大でも半分程度に割り引かれます）。">
           <span class="field-label">難易度連動の予算係数 <small>(budget_c1)</small></span>
-          <input type="number" step="0.01" name="budget_c1" />
+          <div class="field-input-pair">
+            <input type="number" min="0.0" max="150.0" step="0.5" name="budget_c1" />
+            <input type="range" min="0.0" max="150.0" step="0.5" name="budget_c1__range" />
+          </div>
         </label>
         <label title="倒産も契約打ち切りもせずに生き残れた場合の、最大継続ラウンド数です。この回数に達して終了した場合は「生き残り切った」という扱いで、悪い結果ではありません。">
           <span class="field-label">1回のシミュレーションの最大ラウンド数 <small>(max_rounds)</small></span>
-          <input type="number" step="1" name="max_rounds" />
+          <div class="field-input-pair">
+            <input type="number" min="1" max="1000" step="1" name="max_rounds" />
+            <input type="range" min="1" max="1000" step="1" name="max_rounds__range" />
+          </div>
         </label>
         <label title="B社が毎ラウンド、どの性能のモデルを何人分投入するかを決める行動方針です。conservative（保守的）は成功最優先、cost_optimal（コスト最適）は資金温存優先、adaptive（適応型）は資金残量や直近成績に応じて方針を切り替えます。">
           <span class="field-label">B社の投資方針 <small>(strategy)</small></span>
@@ -181,11 +259,17 @@
         </label>
         <label title="同じ設定で「運（乱数）」だけを変えて何回シミュレーションを繰り返すか（1〜500）です。回数を増やすほど、成功率などの平均値の信頼性が上がります。">
           <span class="field-label">試行回数 <small>(n_trials)</small></span>
-          <input type="number" step="1" name="n_trials" />
+          <div class="field-input-pair">
+            <input type="number" min="1" max="500" step="1" name="n_trials" />
+            <input type="range" min="1" max="500" step="1" name="n_trials__range" />
+          </div>
         </label>
         <label title="シミュレーションの「運」を決める乱数の出発点となる整数値です。同じbase_seedと設定であれば、何度実行しても全く同じ結果が再現されます（比較実験の再現性確保用）。">
           <span class="field-label">乱数の開始番号 <small>(base_seed)</small></span>
-          <input type="number" step="1" name="base_seed" />
+          <div class="field-input-pair">
+            <input type="number" min="0" max="1000000" step="1" name="base_seed" />
+            <input type="range" min="0" max="1000000" step="1" name="base_seed__range" />
+          </div>
         </label>
       </div>
       <div class="actions">
@@ -199,7 +283,10 @@
   </div>
 
   <div class="panel">
-    <h2>集計結果サマリー</h2>
+    <div class="title-with-badge">
+      <h2>集計結果サマリー</h2>
+      <span id="run-mode-badge" class="run-mode-badge"></span>
+    </div>
     <div id="summary" class="summary-grid"></div>
   </div>
 
@@ -215,6 +302,51 @@
     <div id="sensitivity-estimate-note" class="small"></div>
     <div id="sensitivity-status" class="small"></div>
     <div id="sensitivity-result"></div>
+  </div>
+
+  <div class="panel">
+    <h2>独走勝ち組型への逆算（2段階）</h2>
+    <p class="small">
+      目的関数は「独走勝ち組型（dominant_leader）に入る割合」です。平均純利益は参考情報として併記します。<br />
+      各ラウンドで消費される乱数の「順番」自体は、パラメータ値や成功・失敗の結果に関わらず常に同じです
+      （コスト用の対数正規乱数1回→成功判定の一様乱数1回、の順）。したがって、比較対象の2つの設定が
+      同じシードで、かつ両方ともまだ試行が続いている間は、文字通り同じ乱数を使って計算されており、
+      乱数由来のブレは実質的に打ち消し合います。限界が生じるのは、一方の設定が倒産や契約打ち切りで
+      先に試行を終えてしまった場合です。その回以降は、もう一方の設定に対応する「ペアとなる乱数」が
+      存在しなくなり、それ以降の比較はできなくなります（乱数の使われる順番がズレるのではなく、
+      試行そのものが早く終わることでペアの片割れが失われる、という意味での限界です）。
+    </p>
+
+    <div class="reverse-calc-card">
+      <h3>① 影響度ランキングを実行</h3>
+      <div class="actions">
+        <button type="button" id="reverse-stage1-run-btn">影響度ランキングを実行</button>
+        <span id="reverse-stage1-estimate" class="small"></span>
+      </div>
+      <div id="reverse-stage1-estimate-note" class="small"></div>
+      <div id="reverse-stage1-status" class="small"></div>
+      <div id="reverse-stage1-result"></div>
+    </div>
+
+    <div id="reverse-stage2-card" class="reverse-calc-card reverse-calc-disabled">
+      <h3>② 組み合わせ探索でおすすめ設定を出す</h3>
+      <p class="small reverse-disclaimer">
+        「①影響度ランキング」で選ばれた上位2パラメータについて、75%/100%/125%の組み合わせ（最大9通り）を
+        まず軽い試行回数でスクリーニングし、その中から独走勝ち組型の割合が高い上位3候補だけを、
+        現在フォームで指定されている試行回数（精密n_trials）で改めて検証しています。ここに表示される
+        「候補」は、この精密検証を経た結果のみです。なお、対象を2パラメータに絞っているため、
+        3つ以上のパラメータが組み合わさって初めて効果が出るようなケースは検出できません。あくまで
+        「主要な2要因を動かした場合の目安」としてご利用ください。
+      </p>
+      <div id="reverse-param-select" class="reverse-params small"></div>
+      <div class="actions">
+        <button type="button" id="reverse-stage2-run-btn" disabled>組み合わせ探索でおすすめ設定を出す</button>
+        <span id="reverse-stage2-estimate" class="small"></span>
+      </div>
+      <div id="reverse-stage2-estimate-note" class="small"></div>
+      <div id="reverse-stage2-status" class="small"></div>
+      <div id="reverse-stage2-result"></div>
+    </div>
   </div>
 
   <div class="panel">
@@ -242,6 +374,26 @@
       gamma: 0.15, partial_pay: 0.0, r_min: 0.4, max_consecutive_failures: 3,
       difficulty_0: 1.0, funds_0: 100.0, difficulty_cap: 20.0, budget_c0: 5.0, budget_c1: 15.0,
       max_rounds: 200, strategy: "adaptive", n_trials: 100, base_seed: 0
+    };
+    const PARAM_CONFIG = {
+      alpha: { min: 0.01, max: 2.0, step: 0.01 },
+      beta: { min: 0.01, max: 20.0, step: 0.1 },
+      lam: { min: 0.0, max: 1.0, step: 0.01 },
+      k1: { min: 0.01, max: 10.0, step: 0.01 },
+      cost_curve_exponent: { min: 0.5, max: 5.0, step: 0.1 },
+      sigma_noise: { min: 0.0, max: 2.0, step: 0.01 },
+      gamma: { min: 0.0, max: 2.0, step: 0.01 },
+      partial_pay: { min: 0.0, max: 1.0, step: 0.01 },
+      r_min: { min: 0.0, max: 1.0, step: 0.01 },
+      max_consecutive_failures: { min: 1, max: 50, step: 1, integer: true },
+      difficulty_0: { min: 0.01, max: 20.0, step: 0.01 },
+      funds_0: { min: 1.0, max: 2000.0, step: 1.0 },
+      difficulty_cap: { min: 1.0, max: 100.0, step: 0.1 },
+      budget_c0: { min: 0.0, max: 100.0, step: 0.5 },
+      budget_c1: { min: 0.0, max: 150.0, step: 0.5 },
+      max_rounds: { min: 1, max: 1000, step: 1, integer: true },
+      n_trials: { min: 1, max: 500, step: 1, integer: true },
+      base_seed: { min: 0, max: 1000000, step: 1, integer: true }
     };
     const strategyOrder = ["conservative", "cost_optimal", "adaptive"];
     const STRATEGY_LABEL_JA = {
@@ -307,6 +459,23 @@
       cost_optimal: "triangle",
       adaptive: "rect"
     };
+    const PREVIEW_DEBOUNCE_MS = 250;
+    const PREVIEW_N_TRIALS = 20;
+    const REVERSE_STAGE1_PARAMS = ["alpha", "k1", "budget_c0", "budget_c1", "gamma", "difficulty_0", "funds_0"];
+    const REVERSE_FACTORS = [0.75, 1.0, 1.25];
+    const REVERSE_PARAM_LABELS = {
+      alpha: "alpha",
+      k1: "k1",
+      budget_c0: "budget_c0",
+      budget_c1: "budget_c1",
+      gamma: "gamma",
+      difficulty_0: "difficulty_0",
+      funds_0: "funds_0"
+    };
+    const REVERSE_STAGE1_CALLS = 21;
+    const REVERSE_STAGE2_PREVIEW_CALLS = 9;
+    const REVERSE_STAGE2_PRECISE_CALLS = 3;
+    const REVERSE_STAGE2_CALLS = REVERSE_STAGE2_PREVIEW_CALLS + REVERSE_STAGE2_PRECISE_CALLS;
 
     const quadrantThresholdPlugin = {
       id: "quadrantThresholds",
@@ -336,7 +505,11 @@
     };
 
     const form = document.getElementById("sim-form");
+    const baselineBtn = document.getElementById("baseline-btn");
+    const runBtn = document.getElementById("run-btn");
+    const compareBtn = document.getElementById("compare-btn");
     const summaryEl = document.getElementById("summary");
+    const runModeBadgeEl = document.getElementById("run-mode-badge");
     const errorEl = document.getElementById("error");
     const quadrantLegendEl = document.getElementById("quadrant-legend");
     const sensitivityEstimateEl = document.getElementById("sensitivity-estimate");
@@ -344,10 +517,29 @@
     const sensitivityStatusEl = document.getElementById("sensitivity-status");
     const sensitivityResultEl = document.getElementById("sensitivity-result");
     const sensitivityRunBtn = document.getElementById("sensitivity-run-btn");
+    const reverseStage1RunBtn = document.getElementById("reverse-stage1-run-btn");
+    const reverseStage1EstimateEl = document.getElementById("reverse-stage1-estimate");
+    const reverseStage1EstimateNoteEl = document.getElementById("reverse-stage1-estimate-note");
+    const reverseStage1StatusEl = document.getElementById("reverse-stage1-status");
+    const reverseStage1ResultEl = document.getElementById("reverse-stage1-result");
+    const reverseStage2Card = document.getElementById("reverse-stage2-card");
+    const reverseParamSelectEl = document.getElementById("reverse-param-select");
+    const reverseStage2RunBtn = document.getElementById("reverse-stage2-run-btn");
+    const reverseStage2EstimateEl = document.getElementById("reverse-stage2-estimate");
+    const reverseStage2EstimateNoteEl = document.getElementById("reverse-stage2-estimate-note");
+    const reverseStage2StatusEl = document.getElementById("reverse-stage2-status");
+    const reverseStage2ResultEl = document.getElementById("reverse-stage2-result");
+
     let scatterChart = null;
     let histChart = null;
     let latestMainResponse = null;
     let sensitivityRunning = false;
+    let reverseCalcRunning = false;
+    let reverseStage1Done = false;
+    let reverseRecommendedCandidates = [];
+    let previewTimer = null;
+    let previewController = null;
+    let previewToken = 0;
 
     function formatStrategy(strategy) {
       return `${STRATEGY_LABEL_JA[strategy] || strategy} (${strategy})`;
@@ -365,17 +557,144 @@
       return `rgba(${r}, ${g}, ${b}, ${alpha})`;
     }
 
-    function setDefaults() {
-      for (const [key, value] of Object.entries(defaults)) {
-        const el = form.elements[key];
-        if (el) el.value = value;
-      }
-      updateSensitivityEstimate();
+    function stepDigits(step) {
+      const text = String(step);
+      const dot = text.indexOf(".");
+      return dot >= 0 ? text.length - dot - 1 : 0;
+    }
+
+    function formatParamValue(name, value) {
+      const cfg = PARAM_CONFIG[name];
+      if (!cfg) return String(value);
+      if (cfg.integer) return String(Math.round(value));
+      return Number(value).toFixed(stepDigits(cfg.step));
     }
 
     function numberValue(name, asInt = false) {
-      const raw = form.elements[name].value;
-      return asInt ? parseInt(raw, 10) : parseFloat(raw);
+      const raw = form.elements[name]?.value;
+      if (asInt) return parseInt(raw, 10);
+      return parseFloat(raw);
+    }
+
+    function clampParamValue(name, value, difficultyCapOverride = null) {
+      const cfg = PARAM_CONFIG[name];
+      if (!cfg) return value;
+      let min = cfg.min;
+      let max = cfg.max;
+      if (name === "difficulty_0") {
+        const cap = Number.isFinite(difficultyCapOverride) ? difficultyCapOverride : numberValue("difficulty_cap");
+        if (Number.isFinite(cap)) max = Math.min(max, cap);
+      }
+      let next = Number(value);
+      if (!Number.isFinite(next)) next = min;
+      next = Math.min(max, Math.max(min, next));
+      if (cfg.integer) next = Math.round(next);
+      const digits = stepDigits(cfg.step);
+      return Number(next.toFixed(digits));
+    }
+
+    function setFieldValue(name, value) {
+      const next = clampParamValue(name, value);
+      const numberEl = form.elements[name];
+      const rangeEl = form.elements[`${name}__range`];
+      const formatted = formatParamValue(name, next);
+      if (numberEl) numberEl.value = formatted;
+      if (rangeEl) rangeEl.value = formatted;
+    }
+
+    function syncDifficultyCapConstraint() {
+      const capVal = numberValue("difficulty_cap");
+      if (!Number.isFinite(capVal)) return;
+      const d0NumberEl = form.elements["difficulty_0"];
+      const d0RangeEl = form.elements["difficulty_0__range"];
+      if (!d0NumberEl || !d0RangeEl) return;
+      const capText = formatParamValue("difficulty_cap", capVal);
+      d0NumberEl.max = capText;
+      d0RangeEl.max = capText;
+      const d0Val = numberValue("difficulty_0");
+      if (Number.isFinite(d0Val) && d0Val > capVal) {
+        setFieldValue("difficulty_0", capVal);
+      }
+    }
+
+    function normalizeField(name) {
+      const cfg = PARAM_CONFIG[name];
+      if (!cfg) return;
+      const raw = numberValue(name, !!cfg.integer);
+      const normalized = clampParamValue(name, raw);
+      setFieldValue(name, normalized);
+    }
+
+    function cancelPreviewPipeline() {
+      clearTimeout(previewTimer);
+      previewTimer = null;
+      if (previewController) {
+        previewController.abort();
+        previewController = null;
+      }
+      previewToken += 1;
+    }
+
+    function isFormValid() {
+      for (const [name, cfg] of Object.entries(PARAM_CONFIG)) {
+        const val = numberValue(name, !!cfg.integer);
+        if (!Number.isFinite(val)) return false;
+      }
+      const d0 = numberValue("difficulty_0");
+      const cap = numberValue("difficulty_cap");
+      if (!Number.isFinite(d0) || !Number.isFinite(cap)) return false;
+      return d0 <= cap;
+    }
+
+    function bindSliderSync(name) {
+      const numberEl = form.elements[name];
+      const rangeEl = form.elements[`${name}__range`];
+      if (!numberEl || !rangeEl) return;
+
+      rangeEl.addEventListener("input", () => {
+        numberEl.value = rangeEl.value;
+        if (name === "difficulty_cap") syncDifficultyCapConstraint();
+        onLiveParamInput(name);
+      });
+      rangeEl.addEventListener("change", () => {
+        numberEl.value = rangeEl.value;
+        normalizeField(name);
+        if (name === "difficulty_cap") syncDifficultyCapConstraint();
+        onLiveParamCommit(name);
+      });
+      numberEl.addEventListener("input", () => {
+        const raw = parseFloat(numberEl.value);
+        if (Number.isFinite(raw)) {
+          rangeEl.value = numberEl.value;
+        }
+        if (name === "difficulty_cap") syncDifficultyCapConstraint();
+        onLiveParamInput(name);
+      });
+      numberEl.addEventListener("change", () => {
+        normalizeField(name);
+        if (name === "difficulty_cap") syncDifficultyCapConstraint();
+        onLiveParamCommit(name);
+      });
+    }
+
+    function setDefaults() {
+      for (const [key, value] of Object.entries(defaults)) {
+        const numberEl = form.elements[key];
+        const rangeEl = form.elements[`${key}__range`];
+        if (numberEl) numberEl.value = value;
+        if (rangeEl) rangeEl.value = value;
+      }
+      syncDifficultyCapConstraint();
+      reverseStage1Done = false;
+      reverseRecommendedCandidates = [];
+      reverseStage1ResultEl.innerHTML = "";
+      reverseStage2ResultEl.innerHTML = "";
+      reverseStage1StatusEl.textContent = "";
+      reverseStage2StatusEl.textContent = "";
+      reverseParamSelectEl.innerHTML = "<span>段階①を実行すると、上位4パラメータ候補から2つを選べます。</span>";
+      updateSensitivityEstimate();
+      updateReverseEstimates();
+      updateActionButtons();
     }
 
     function buildPayload(compareStrategies) {
@@ -456,6 +775,17 @@
       else if (high < base && base < low) direction = "減少方向（値を上げると平均純利益が減る傾向）";
       else direction = "方向が一定しない（試行回数が少なく、乱数ノイズの影響が大きい可能性）";
       return { low, base, high, deltaLowPct, deltaHighPct, maxAbsDeltaPct, direction };
+    }
+
+    function summarizeQuadrantSweep(low, base, high) {
+      const deltaLowPt = low - base;
+      const deltaHighPt = high - base;
+      const maxAbsDeltaPt = Math.max(Math.abs(deltaLowPt), Math.abs(deltaHighPt));
+      let direction;
+      if (high > base && base > low) direction = "増加方向（値を上げると独走勝ち組型の割合が増える傾向）";
+      else if (high < base && base < low) direction = "減少方向（値を上げると独走勝ち組型の割合が減る傾向）";
+      else direction = "方向が一定しない（試行回数が少なく、乱数ノイズの影響が大きい可能性）";
+      return { low, base, high, deltaLowPt, deltaHighPt, maxAbsDeltaPt, direction };
     }
 
     function showSummary(response) {
@@ -645,6 +975,27 @@
       });
     }
 
+    function renderRunModeBadge(response, isPreview) {
+      if (!response || !response.meta) {
+        runModeBadgeEl.textContent = "";
+        runModeBadgeEl.className = "run-mode-badge";
+        return;
+      }
+      const n = response.meta.n_trials;
+      runModeBadgeEl.textContent = isPreview ? `プレビュー (n=${n})` : `精密 (n=${n})`;
+      runModeBadgeEl.className = `run-mode-badge ${isPreview ? "is-preview" : "is-precise"}`;
+    }
+
+    function renderLiveResult(body, isPreview) {
+      latestMainResponse = body;
+      showSummary(body);
+      drawScatter(body);
+      drawHistogram(body);
+      renderRunModeBadge(body, isPreview);
+      updateSensitivityEstimate();
+      updateReverseEstimates();
+    }
+
     function updateSensitivityEstimate() {
       const targetStrategy = form.elements["strategy"].value;
       const targetStrategyJa = STRATEGY_LABEL_JA[targetStrategy] || targetStrategy;
@@ -660,11 +1011,38 @@
         : "";
     }
 
-    async function postSimulate(payload) {
+    function updateReverseEstimates() {
+      const targetStrategy = form.elements["strategy"].value;
+      const targetStrategyJa = STRATEGY_LABEL_JA[targetStrategy] || targetStrategy;
+      const formNTrials = Math.max(1, numberValue("n_trials", true) || 1);
+      const stage1NTrials = Math.min(80, formNTrials);
+      const stage2PreviewNTrials = Math.min(30, formNTrials);
+      let stage1Seconds = null;
+      let stage2Seconds = null;
+      if (latestMainResponse && latestMainResponse.meta && latestMainResponse.meta.n_trials > 0) {
+        stage1Seconds = latestMainResponse.meta.elapsed_seconds * (stage1NTrials / latestMainResponse.meta.n_trials) * REVERSE_STAGE1_CALLS;
+        stage2Seconds =
+          latestMainResponse.meta.elapsed_seconds * (stage2PreviewNTrials / latestMainResponse.meta.n_trials) * REVERSE_STAGE2_PREVIEW_CALLS +
+          latestMainResponse.meta.elapsed_seconds * (formNTrials / latestMainResponse.meta.n_trials) * REVERSE_STAGE2_PRECISE_CALLS;
+      }
+      const stage1SecText = stage1Seconds === null ? "-" : Math.max(stage1Seconds, 0).toFixed(1);
+      const stage2SecText = stage2Seconds === null ? "-" : Math.max(stage2Seconds, 0).toFixed(1);
+      reverseStage1EstimateEl.textContent = `概算所要時間: 約${stage1SecText}秒（追加で最大21回。対象戦略: ${targetStrategyJa}）`;
+      reverseStage2EstimateEl.textContent = `概算所要時間: 約${stage2SecText}秒（追加で最大12回=プレビュー9回+精密3回。対象戦略: ${targetStrategyJa}）`;
+      reverseStage1EstimateNoteEl.textContent = stage1Seconds !== null && stage1Seconds > 10
+        ? "メイン実行の試行回数を減らすと逆算処理が速くなります。"
+        : "";
+      reverseStage2EstimateNoteEl.textContent = stage2Seconds !== null && stage2Seconds > 10
+        ? "メイン実行の試行回数を減らすと逆算処理が速くなります。"
+        : "";
+    }
+
+    async function postSimulate(payload, signal) {
       const res = await fetch("/api/simulate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
+        signal
       });
       const body = await res.json();
       if (!res.ok) {
@@ -674,25 +1052,184 @@
       return body;
     }
 
+    function onLiveParamInput(name) {
+      if (name === "n_trials") {
+        updateSensitivityEstimate();
+        updateReverseEstimates();
+      }
+      if (sensitivityRunning || reverseCalcRunning) return;
+      clearTimeout(previewTimer);
+      if (previewController) previewController.abort();
+      previewTimer = setTimeout(() => { firePreview(); }, PREVIEW_DEBOUNCE_MS);
+    }
+
+    async function firePreview() {
+      if (sensitivityRunning || reverseCalcRunning) return;
+      if (!isFormValid()) return;
+      const token = ++previewToken;
+      previewController = new AbortController();
+      const payload = buildPayload(false);
+      payload.compare_strategies = false;
+      payload.n_trials = Math.min(PREVIEW_N_TRIALS, payload.n_trials);
+      try {
+        const body = await postSimulate(payload, previewController.signal);
+        if (token !== previewToken) return;
+        renderLiveResult(body, true);
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          errorEl.textContent = `プレビューに失敗しました: ${err}`;
+        }
+      } finally {
+        if (token === previewToken) previewController = null;
+      }
+    }
+
+    function onLiveParamCommit(name) {
+      if (name === "n_trials") {
+        updateSensitivityEstimate();
+        updateReverseEstimates();
+      }
+      if (sensitivityRunning || reverseCalcRunning) return;
+      clearTimeout(previewTimer);
+      if (previewController) previewController.abort();
+      if (!isFormValid()) return;
+      const token = ++previewToken;
+      const payload = buildPayload(false);
+      payload.compare_strategies = false;
+      postSimulate(payload).then((body) => {
+        if (token !== previewToken) return;
+        renderLiveResult(body, false);
+      }).catch((err) => {
+        errorEl.textContent = `精密実行に失敗しました: ${err}`;
+      });
+    }
+
+    function dominantLeaderPct(response, strategy) {
+      const rows = response.per_trial.filter((r) => r.strategy === strategy);
+      if (!rows.length) return 0;
+      const hits = rows.filter((r) => r.final_quadrant === "dominant_leader").length;
+      return (hits / rows.length) * 100;
+    }
+
+    function extractStrategyMetrics(response, strategy) {
+      const agg = response.aggregates[strategy] || {};
+      return {
+        dominant_leader_pct: dominantLeaderPct(response, strategy),
+        mean_net_profit: Number(agg.mean_net_profit ?? 0),
+        bankruptcy_rate: Number(agg.bankruptcy_rate ?? 0) * 100,
+        mean_survival_rounds: Number(agg.mean_survival_rounds ?? 0)
+      };
+    }
+
+    function reverseSweepValue(paramName, baseValue, factor, baseParams) {
+      const raw = baseValue * factor;
+      const cap = paramName === "difficulty_0" ? Number(baseParams.difficulty_cap) : null;
+      return clampParamValue(paramName, raw, cap);
+    }
+
+    function renderReverseStage1Table(rows) {
+      if (!rows.length) {
+        reverseStage1ResultEl.innerHTML = "<p class=\"small\">実行対象のパラメータがありませんでした。</p>";
+        return;
+      }
+      const tableRows = rows.map((row) => `
+        <tr>
+          <td>${REVERSE_PARAM_LABELS[row.parameter] || row.parameter}</td>
+          <td>${row.low.toFixed(1)}%</td>
+          <td>${row.base.toFixed(1)}%</td>
+          <td>${row.high.toFixed(1)}%</td>
+          <td>${row.direction}</td>
+          <td>${row.maxAbsDeltaPt.toFixed(1)}pt</td>
+          <td>${row.baseMeanNetProfit.toFixed(2)}</td>
+        </tr>
+      `).join("");
+      reverseStage1ResultEl.innerHTML = `
+        <table class="sensitivity-table">
+          <thead>
+            <tr>
+              <th>パラメータ</th>
+              <th>低(75%)の独走勝ち組型%</th>
+              <th>基準(100%)の独走勝ち組型%</th>
+              <th>高(125%)の独走勝ち組型%</th>
+              <th>傾向</th>
+              <th>最大変化幅(pt)</th>
+              <th>参考: 基準の平均純利益</th>
+            </tr>
+          </thead>
+          <tbody>${tableRows}</tbody>
+        </table>
+        <p class="small reverse-disclaimer">
+          この段階は、上位の影響パラメータを絞り込むための<strong>粗いランキング</strong>です（各点 n=最大80試行）。
+          ここに表示された割合や傾向は、次の「組み合わせ探索」で改めて精密な試行回数で検証されるまでの
+          <strong>暫定値</strong>であり、この段階の数値だけを最終結論として採用しないでください。また、ここでの変化幅は
+          基準値±25%という<strong>近い範囲だけを見た近似</strong>であり、そこから離れた値で挙動が急変する場合（例:
+          エージェント人数投入の効き目(alpha)は基準値から離れた領域で急激に振る舞いが変わることが分かっています）
+          を検知できるとは限りません。
+        </p>
+      `;
+    }
+
+    function getSelectedReverseParams() {
+      return Array.from(reverseParamSelectEl.querySelectorAll("input[type='checkbox']:checked")).map((el) => el.value);
+    }
+
+    function renderReverseParamChoices(rows) {
+      const top4 = rows.slice(0, 4).map((row) => row.parameter);
+      const selected = new Set(rows.slice(0, 2).map((row) => row.parameter));
+      reverseParamSelectEl.innerHTML = top4.map((name) => `
+        <label class="reverse-param-check">
+          <input type="checkbox" class="reverse-param-toggle" value="${name}" ${selected.has(name) ? "checked" : ""} />
+          <span>${REVERSE_PARAM_LABELS[name] || name}</span>
+        </label>
+      `).join("");
+      reverseParamSelectEl.querySelectorAll(".reverse-param-toggle").forEach((el) => {
+        el.addEventListener("change", () => {
+          const selectedNow = getSelectedReverseParams();
+          if (selectedNow.length > 2) {
+            el.checked = false;
+            reverseStage2StatusEl.textContent = "パラメータは2つまで選択できます。";
+          } else {
+            reverseStage2StatusEl.textContent = "";
+          }
+          updateActionButtons();
+        });
+      });
+      updateActionButtons();
+    }
+
+    function updateActionButtons() {
+      const busy = sensitivityRunning || reverseCalcRunning;
+      baselineBtn.disabled = busy;
+      runBtn.disabled = busy;
+      compareBtn.disabled = busy;
+      sensitivityRunBtn.disabled = busy;
+      reverseStage1RunBtn.disabled = busy;
+
+      const selectedParams = getSelectedReverseParams();
+      reverseStage2RunBtn.disabled = busy || !reverseStage1Done || selectedParams.length !== 2;
+      reverseStage2Card.classList.toggle("reverse-calc-disabled", !reverseStage1Done || busy);
+      reverseParamSelectEl.querySelectorAll("input[type='checkbox']").forEach((el) => {
+        el.disabled = busy || !reverseStage1Done;
+      });
+    }
+
     async function runSimulation(compareStrategies) {
+      if (sensitivityRunning || reverseCalcRunning) return;
       errorEl.textContent = "";
       const payload = buildPayload(compareStrategies);
       try {
         const body = await postSimulate(payload);
-        latestMainResponse = body;
-        showSummary(body);
-        drawScatter(body);
-        drawHistogram(body);
-        updateSensitivityEstimate();
+        renderLiveResult(body, false);
       } catch (err) {
         errorEl.textContent = `リクエストに失敗しました: ${err}`;
       }
     }
 
     async function runSensitivitySweep() {
-      if (sensitivityRunning) return;
+      if (sensitivityRunning || reverseCalcRunning) return;
+      cancelPreviewPipeline();
       sensitivityRunning = true;
-      sensitivityRunBtn.disabled = true;
+      updateActionButtons();
       sensitivityStatusEl.textContent = "";
       sensitivityResultEl.innerHTML = "";
       errorEl.textContent = "";
@@ -789,22 +1326,253 @@
         errorEl.textContent = `感度チェックに失敗しました: ${err}`;
       } finally {
         sensitivityRunning = false;
-        sensitivityRunBtn.disabled = false;
+        updateActionButtons();
       }
     }
 
-    document.getElementById("baseline-btn").addEventListener("click", () => {
+    async function runReverseStage1() {
+      if (sensitivityRunning || reverseCalcRunning) return;
+      cancelPreviewPipeline();
+      reverseCalcRunning = true;
+      reverseStage1Done = false;
+      reverseRecommendedCandidates = [];
+      updateActionButtons();
+      reverseStage1StatusEl.textContent = "";
+      reverseStage2StatusEl.textContent = "";
+      reverseStage1ResultEl.innerHTML = "";
+      reverseStage2ResultEl.innerHTML = "";
+      errorEl.textContent = "";
+
+      const basePayload = buildPayload(false);
+      const targetStrategy = basePayload.params.strategy;
+      const sweepNTrials = Math.min(80, Math.max(1, basePayload.n_trials));
+      const baseSeed = basePayload.base_seed;
+      const rows = [];
+      let completedCalls = 0;
+
+      try {
+        for (const paramName of REVERSE_STAGE1_PARAMS) {
+          const baseValue = Number(basePayload.params[paramName]);
+          const values = REVERSE_FACTORS.map((factor) => reverseSweepValue(paramName, baseValue, factor, basePayload.params));
+          const dominantPoints = [];
+          const netProfitPoints = [];
+          for (let i = 0; i < values.length; i++) {
+            const payload = {
+              params: {
+                ...basePayload.params,
+                [paramName]: values[i]
+              },
+              n_trials: sweepNTrials,
+              base_seed: baseSeed,
+              compare_strategies: false
+            };
+            completedCalls += 1;
+            reverseStage1StatusEl.textContent = `影響度ランキング実行中... (${completedCalls}/${REVERSE_STAGE1_CALLS})`;
+            const result = await postSimulate(payload);
+            const metrics = extractStrategyMetrics(result, targetStrategy);
+            dominantPoints.push(metrics.dominant_leader_pct);
+            netProfitPoints.push(metrics.mean_net_profit);
+          }
+          const summary = summarizeQuadrantSweep(
+            dominantPoints[0],
+            dominantPoints[1],
+            dominantPoints[2]
+          );
+          rows.push({
+            parameter: paramName,
+            ...summary,
+            baseMeanNetProfit: netProfitPoints[1]
+          });
+        }
+
+        rows.sort((a, b) => b.maxAbsDeltaPt - a.maxAbsDeltaPt);
+        renderReverseStage1Table(rows);
+        renderReverseParamChoices(rows);
+        reverseStage1Done = true;
+        reverseStage1StatusEl.textContent = `影響度ランキング完了（${completedCalls}回実行）。`;
+      } catch (err) {
+        reverseStage1StatusEl.textContent = "";
+        errorEl.textContent = `影響度ランキングに失敗しました: ${err}`;
+      } finally {
+        reverseCalcRunning = false;
+        updateActionButtons();
+      }
+    }
+
+    function renderReverseCandidates(candidates, baseParams, selectedParams) {
+      if (!candidates.length) {
+        reverseStage2ResultEl.innerHTML = "<p class=\"small\">候補を生成できませんでした。</p>";
+        return;
+      }
+      reverseStage2ResultEl.innerHTML = `
+        <div class="reverse-reco-grid">
+          ${candidates.map((candidate, index) => {
+            const changes = selectedParams.map((name) => {
+              const baseValue = Number(baseParams[name]);
+              const nextValue = Number(candidate.paramValues[name]);
+              let pctLabel = "±0.0%";
+              if (Math.abs(baseValue) > 1e-9) {
+                const pct = ((nextValue - baseValue) / Math.abs(baseValue)) * 100;
+                pctLabel = `${pct >= 0 ? "+" : ""}${pct.toFixed(1)}%`;
+              } else if (Math.abs(nextValue) > 1e-9) {
+                pctLabel = "変化率算出不可";
+              }
+              return `<li>${name}: ${formatParamValue(name, baseValue)} → ${formatParamValue(name, nextValue)}（${pctLabel}）</li>`;
+            }).join("");
+            return `
+              <div class="reverse-reco-card">
+                <h3>候補${index + 1}</h3>
+                <ul>${changes}</ul>
+                <div class="small">独走勝ち組型の割合: ${candidate.metrics.dominant_leader_pct.toFixed(1)}%</div>
+                <div class="small">参考: 平均純利益: ${candidate.metrics.mean_net_profit.toFixed(2)}</div>
+                <div class="small">参考: 倒産割合: ${candidate.metrics.bankruptcy_rate.toFixed(1)}%</div>
+                <div class="small">参考: 平均取引継続ラウンド数: ${candidate.metrics.mean_survival_rounds.toFixed(2)}</div>
+                <div class="actions">
+                  <button type="button" class="apply-reverse-btn" data-index="${index}">この設定をフォームに反映</button>
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+      reverseStage2ResultEl.querySelectorAll(".apply-reverse-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const idx = Number(btn.dataset.index);
+          const candidate = reverseRecommendedCandidates[idx];
+          if (!candidate) return;
+          Object.entries(candidate.paramValues).forEach(([name, value]) => {
+            setFieldValue(name, value);
+          });
+          syncDifficultyCapConstraint();
+          updateSensitivityEstimate();
+          updateReverseEstimates();
+          reverseStage2StatusEl.textContent = `候補${idx + 1}をフォームに反映しました。シミュレーションは自動実行していません。`;
+        });
+      });
+    }
+
+    async function runReverseStage2() {
+      if (sensitivityRunning || reverseCalcRunning || !reverseStage1Done) return;
+      const selectedParams = getSelectedReverseParams();
+      if (selectedParams.length !== 2) {
+        reverseStage2StatusEl.textContent = "段階②ではパラメータを2つ選択してください。";
+        updateActionButtons();
+        return;
+      }
+      cancelPreviewPipeline();
+      reverseCalcRunning = true;
+      updateActionButtons();
+      reverseStage2StatusEl.textContent = "";
+      reverseStage2ResultEl.innerHTML = "";
+      errorEl.textContent = "";
+
+      const basePayload = buildPayload(false);
+      const targetStrategy = basePayload.params.strategy;
+      const previewNTrials = Math.min(30, Math.max(1, basePayload.n_trials));
+      const preciseNTrials = Math.max(1, basePayload.n_trials);
+      const baseSeed = basePayload.base_seed;
+      let completedCalls = 0;
+
+      try {
+        const [paramA, paramB] = selectedParams;
+        const baseA = Number(basePayload.params[paramA]);
+        const baseB = Number(basePayload.params[paramB]);
+        const previewCandidates = [];
+
+        for (const factorA of REVERSE_FACTORS) {
+          for (const factorB of REVERSE_FACTORS) {
+            const valueA = reverseSweepValue(paramA, baseA, factorA, basePayload.params);
+            const valueB = reverseSweepValue(paramB, baseB, factorB, basePayload.params);
+            const payload = {
+              params: {
+                ...basePayload.params,
+                [paramA]: valueA,
+                [paramB]: valueB
+              },
+              n_trials: previewNTrials,
+              base_seed: baseSeed,
+              compare_strategies: false
+            };
+            completedCalls += 1;
+            reverseStage2StatusEl.textContent = `組み合わせ探索（プレビュー）実行中... (${completedCalls}/${REVERSE_STAGE2_CALLS})`;
+            const result = await postSimulate(payload);
+            const metrics = extractStrategyMetrics(result, targetStrategy);
+            previewCandidates.push({
+              paramValues: { [paramA]: valueA, [paramB]: valueB },
+              previewDominantPct: metrics.dominant_leader_pct,
+              previewMeanNetProfit: metrics.mean_net_profit
+            });
+          }
+        }
+
+        previewCandidates.sort((a, b) => {
+          if (b.previewDominantPct !== a.previewDominantPct) return b.previewDominantPct - a.previewDominantPct;
+          return b.previewMeanNetProfit - a.previewMeanNetProfit;
+        });
+        const top3 = previewCandidates.slice(0, REVERSE_STAGE2_PRECISE_CALLS);
+        const finalCandidates = [];
+        for (let i = 0; i < top3.length; i++) {
+          const candidate = top3[i];
+          const payload = {
+            params: {
+              ...basePayload.params,
+              ...candidate.paramValues
+            },
+            n_trials: preciseNTrials,
+            base_seed: baseSeed,
+            compare_strategies: false
+          };
+          completedCalls += 1;
+          reverseStage2StatusEl.textContent = `組み合わせ探索（精密検証）実行中... (${completedCalls}/${REVERSE_STAGE2_CALLS})`;
+          const result = await postSimulate(payload);
+          finalCandidates.push({
+            paramValues: candidate.paramValues,
+            metrics: extractStrategyMetrics(result, targetStrategy)
+          });
+        }
+
+        finalCandidates.sort((a, b) => {
+          if (b.metrics.dominant_leader_pct !== a.metrics.dominant_leader_pct) {
+            return b.metrics.dominant_leader_pct - a.metrics.dominant_leader_pct;
+          }
+          return b.metrics.mean_net_profit - a.metrics.mean_net_profit;
+        });
+        reverseRecommendedCandidates = finalCandidates;
+        renderReverseCandidates(finalCandidates, basePayload.params, selectedParams);
+        reverseStage2StatusEl.textContent = `組み合わせ探索完了（${completedCalls}回実行）。`;
+      } catch (err) {
+        reverseStage2StatusEl.textContent = "";
+        errorEl.textContent = `組み合わせ探索に失敗しました: ${err}`;
+      } finally {
+        reverseCalcRunning = false;
+        updateActionButtons();
+      }
+    }
+
+    Object.keys(PARAM_CONFIG).forEach((name) => bindSliderSync(name));
+
+    baselineBtn.addEventListener("click", () => {
       setDefaults();
       errorEl.textContent = "";
       runSimulation(false);
     });
-    document.getElementById("run-btn").addEventListener("click", () => runSimulation(false));
-    document.getElementById("compare-btn").addEventListener("click", () => runSimulation(true));
-    document.getElementById("sensitivity-run-btn").addEventListener("click", () => runSensitivitySweep());
-    form.elements["strategy"].addEventListener("change", updateSensitivityEstimate);
-    form.elements["n_trials"].addEventListener("input", updateSensitivityEstimate);
+    runBtn.addEventListener("click", () => runSimulation(false));
+    compareBtn.addEventListener("click", () => runSimulation(true));
+    sensitivityRunBtn.addEventListener("click", () => runSensitivitySweep());
+    reverseStage1RunBtn.addEventListener("click", () => runReverseStage1());
+    reverseStage2RunBtn.addEventListener("click", () => runReverseStage2());
+    form.elements["strategy"].addEventListener("change", () => {
+      updateSensitivityEstimate();
+      updateReverseEstimates();
+      onLiveParamCommit("strategy");
+    });
+    form.elements["n_trials"].addEventListener("input", () => {
+      updateSensitivityEstimate();
+      updateReverseEstimates();
+    });
 
     setDefaults();
+    renderRunModeBadge(null, false);
     renderQuadrantLegend(false);
   </script>
 </body>
