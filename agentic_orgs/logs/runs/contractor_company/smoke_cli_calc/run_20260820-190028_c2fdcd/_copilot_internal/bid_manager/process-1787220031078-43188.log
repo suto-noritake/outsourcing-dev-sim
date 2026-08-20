@@ -1,0 +1,20 @@
+2026-08-20T10:00:31.080Z [INFO] Shell completions: no supported shell detected, skipping
+2026-08-20T10:00:31.804Z [INFO] Session indexing debug: SESSION_INDEXING=true, repository=undefined
+2026-08-20T10:00:31.826Z [INFO] [managedSettings] device MDM: no policy present on this device
+2026-08-20T10:00:31.826Z [INFO] [managedSettings] server policy: none for this account served from fresh cache (age 879596ms) from https://github.com
+2026-08-20T10:00:31.826Z [INFO] [managedSettings] effective policy resolved: source=none, bypassDisabled=false, serverFetchFailed=false
+2026-08-20T10:00:32.199Z [INFO] [managedSettings] applied: no bypass restriction in force (managed policy absent)
+2026-08-20T10:00:32.247Z [INFO] Workspace initialized: 768d43ca-20f4-4508-9590-37178cdb058e (checkpoints: 0)
+2026-08-20T10:00:32.276Z [INFO] Starting Copilot CLI: 1.0.80
+2026-08-20T10:00:32.276Z [INFO] Node.js version: v24.16.0
+2026-08-20T10:00:32.431Z [INFO] No update needed, current version is 1.0.80, fetched latest release is v1.0.80
+2026-08-20T10:00:34.765Z [ERROR] [rust:rmcp::transport::worker] worker quit with fatal: Transport channel closed, when Client(OAuthChallenge { www_authenticate_header: "******"\", authorization_uri=\"https://login.microsoftonline.com/common/oauth2/authorize\", client_id=\"fdcc1f02-fc51-4226-8753-f668596af7f7\", resource_metadata=\"https://workiq.svc.cloud.microsoft/.well-known/oauth-protected-resource/mcp\"", response: McpOAuthHttpResponse { status_code: 401, header_count: 9, has_body: true } })
+2026-08-20T10:00:36.754Z [WARNING] Allowed model policy requested without a cwd; no models will be allowed.
+2026-08-20T10:00:36.755Z [INFO]  
+2026-08-20T10:00:36.755Z [INFO] --- Start of group: configured settings: ---
+2026-08-20T10:00:36.756Z [INFO] --- End of group ---
+2026-08-20T10:00:37.614Z [ERROR] Hook from "build-perf-cpp@copilot-plugins" execution failed: Error: Hook command failed with code 1
+Stderr: [31;1mWrite-Error: [31;1mThe NuGet CLI ('nuget') was not found on PATH. Install it with 'winget install Microsoft.NuGet' or download https://aka.ms/nugetclidl and add it to PATH.[0m
+
+2026-08-20T10:00:37.617Z [INFO] --- Start of group: Completion request configuration:  ---
+2026-08-20T10:00:37.618Z [INFO] --- End of group ---

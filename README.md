@@ -96,7 +96,27 @@ Brand Designerが白紙から「インタラクティブな調査報告書」と
   製品を同じ4ロール・マルチエージェント開発プロセスで作る際に使える汎用プレイブック
   （役割定義、モデル割当指針、発注プロンプトのテンプレート、SQL todo運用パターン、
   オーケストレーターの独立検証チェックリスト、既知の落とし穴、クライアントフィードバック
-  対応のvNイテレーションパターン）。
+  対応のvNイテレーションパターン、チームメンバーのMarkdown宣言的管理パターン）。
+
+## Phase 11: 委託元会社システム／受託会社システムのメタ実装
+
+[`agentic_orgs/`](agentic_orgs/README.md) — これまで人間が手動で担ってきた「委託元役」
+（要求・フィードバック投入）と「受託会社の開発パイプライン発注」を、それぞれ**実際に
+GitHub Copilot CLI (`copilot`) をサブプロセスとして呼び出す実行可能システム**として構築した。
+
+- **委託元会社システム**（`client_company/`）: ABMパラメータ（`funds`, `budget_c0/c1`,
+  `difficulty_0`, `k1`, `gamma`, `alpha`等）に応じた経営層ペルソナで要求書を生成する。
+- **受託会社システム**（`contractor_company/`）: 要求書＋対象ワークスペースを受け取り、
+  `team/*.md`（YAML frontmatter＋人格プロンプト）で宣言的に管理されたチームメンバー
+  （Bid Manager / Architect / Implementer / QA / 任意Brand Designer）を、`copilot` CLIの
+  独立サブプロセスとして順に実行する。
+- **チームメンバーはMarkdownファイルで増減できる**（コード変更不要）。**メンバーごとの
+  コンテキストは明確に分離**され（毎回新規セッション、情報伝達はファイル成果物のみ）、
+  実行ログの`session_id`が呼び出しごとに異なることで実機確認済み。
+- 両システムは実際にAIクレジットを消費する（モックではない）半自動方式で、開発は
+  既存の4ロールパイプラインで実施した（詳細は
+  [`docs/experiments/006_phase11_agentic_orgs_meta_system.md`](docs/experiments/006_phase11_agentic_orgs_meta_system.md)、
+  各ロールのログは`agentic_orgs/logs/v6_*_log.md`）。
 
 ## リポジトリ構成
 
@@ -106,6 +126,7 @@ scripts/                    # モンテカルロ実行・スクリーニング�
 tests/                      # ユニットテスト
 docs/                       # 設計ドキュメント・実験記録
 product/abm-dashboard/      # Phase6: ABMインタラクティブダッシュボード（製品）
+agentic_orgs/                # Phase11: 委託元/受託会社システム（copilot CLIメタ実装）
 ```
 
 ## セットアップ

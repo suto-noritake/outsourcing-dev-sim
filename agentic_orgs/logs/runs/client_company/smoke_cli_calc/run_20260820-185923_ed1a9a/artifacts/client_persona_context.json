@@ -1,0 +1,53 @@
+{
+  "case_id": "smoke_cli_calc",
+  "task_theme": "シンプルなCLI電卓を作って",
+  "abm_parameters": {
+    "funds_0": 100.0,
+    "budget_c0": 5.0,
+    "budget_c1": 15.0,
+    "difficulty_0": 1.0,
+    "k1": 1.0,
+    "gamma": 0.15,
+    "alpha": 0.6,
+    "partial_pay": 0.0,
+    "r_min": 0.4,
+    "max_consecutive_failures": 3
+  },
+  "persona_assessment": {
+    "ambition_level": "medium",
+    "strictness_level": "medium",
+    "factor_levels": {
+      "gamma": "medium",
+      "difficulty_0": "medium",
+      "budget_c0": "medium",
+      "budget_c1": "medium",
+      "partial_pay": "medium",
+      "r_min": "medium",
+      "max_consecutive_failures": "medium"
+    },
+    "rationale": {
+      "ambition": "バランス志向。成長と実現可能性の均衡を重視する。",
+      "strictness": "中庸な審査姿勢。品質を求めつつ、合理的な改善機会は認める。"
+    }
+  },
+  "defaults_reference": {
+    "alpha": 0.6,
+    "beta": 3.0,
+    "lam": 0.7,
+    "k1": 1.0,
+    "cost_curve_exponent": 2.0,
+    "sigma_noise": 0.3,
+    "gamma": 0.15,
+    "partial_pay": 0.0,
+    "r_min": 0.4,
+    "max_consecutive_failures": 3,
+    "difficulty_0": 1.0,
+    "funds_0": 100.0,
+    "difficulty_cap": 20.0,
+    "budget_c0": 5.0,
+    "budget_c1": 15.0,
+    "max_rounds": 200,
+    "seed": null,
+    "strategy": "adaptive"
+  }
+}

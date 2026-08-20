@@ -47,6 +47,31 @@
 - Implementerは、複数の専門ロールから出た確定仕様を**統合するだけ**で済むようにする
   （専門ロール側で「Implementerがそのまま実装できる粒度」まで仕様を具体化させておく）。
 
+### 2.2 チームメンバーのMarkdown宣言的管理（実例: Phase11 `agentic_orgs/`）
+
+このプレイブック自体を、コード変更なしにチーム編成を増減できる形で運用したい場合
+（例: 受託会社システムを実際に自動実行するメタシステムを作る場合）、各ロールを
+コードにハードコードせず、**1メンバー＝1つのMarkdownファイル（YAML frontmatter＋
+人格プロンプト本文）として宣言的に管理する**設計が有効である（詳細実装は
+`agentic_orgs/README.md`、確定仕様は`agentic_orgs/logs/v6_architect_log.md`参照）。
+
+- frontmatterの最小スキーマ: `id`（一意）, `name`, `role`, `model`, `order`（実行順序）
+  を必須とし、`enabled`（true/false）, `reasoning_effort`, `specialty`, `depends_on`
+  （依存メンバーIDのリスト）, `permissions`（ツール権限）等を任意とする。
+- **メンバーの増減はファイル操作だけで完結させる**: 追加は新規`.md`を置くだけ、
+  一時停止は`enabled: false`にするだけ、恒久的な削除はファイル削除だけ。コードを
+  変更しない。
+- 実行順序・依存関係は、本プレイブックの「SQL todos + todo_deps」と同じ考え方を
+  Markdown上で表現する（`order`昇順、`depends_on`によるトポロジカルソート、循環依存は
+  致命的エラーとして検出）。
+- **各メンバーの呼び出しは常に独立プロセスとし、他メンバーと会話履歴・セッションを
+  共有しない**（コンテキスト分離の原則）。メンバー間の情報伝達はファイル成果物の
+  受け渡しのみで行い、前メンバーの生の対話ログをそのまま次メンバーのプロンプトに
+  混入させない。ログもメンバー・案件・実行回ごとに完全に分離して保存する。
+- この方式は、Bid Manager/Architect/Implementer/QA/Brand Designerといった既存の
+  役割体系をそのままMarkdown化できるだけでなく、将来的にプロジェクトごとに異なる
+  専門ロール（2.1参照）を追加・削除する運用にも自然に対応できる。
+
 ## 3. モデル・reasoning_effort 割当の指針
 
 Phase6で採用した実例（`gpt-5-mini`/`claude-sonnet-5`/`gpt-5.3-codex`/`gemini-3.1-pro-preview`）
@@ -153,3 +178,13 @@ INSERT INTO todo_deps (todo_id, depends_on) VALUES
 具体的な発注プロンプトの書き方、実際に見つかった問題、モデル選定の詳細な結果は
 [`docs/experiments/005_phase6_product_multiagent_case_study.md`](experiments/005_phase6_product_multiagent_case_study.md)
 および `product/abm-dashboard/logs/` 以下の各ロールの生ログを参照。
+
+## 参考: Phase11での実例（このプレイブック自体をシステム化した事例）
+
+2.2節のMarkdown宣言的チーム管理を実装したメタシステムの実例は
+[`agentic_orgs/README.md`](../agentic_orgs/README.md)、詳細な実施経緯は
+[`docs/experiments/006_phase11_agentic_orgs_meta_system.md`](experiments/006_phase11_agentic_orgs_meta_system.md)
+および `agentic_orgs/logs/v6_*_log.md` を参照。GitHub Copilot CLI (`copilot`) を
+サブプロセスとして呼び出す共通ラッパー（`agentic_orgs/common/copilot_cli.py`）と、
+Markdownチーム定義ローダー（`agentic_orgs/common/team_loader.py`）は、本プレイブックの
+考え方を実行可能な形にした参照実装として再利用できる。
